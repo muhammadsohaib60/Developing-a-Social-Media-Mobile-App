@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const index = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <Text>index</Text>
+      <Text>This is splash screen</Text>
     </SafeAreaView>
   );
 };
