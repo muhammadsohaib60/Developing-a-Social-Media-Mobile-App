@@ -21,13 +21,13 @@ const SplashScreen = () => {
         Animated.parallel([
           Animated.timing(rotation, {
             toValue: 1,
-            duration: 1000,
+            duration: 500,
             easing: Easing.ease,
             useNativeDriver: true,
           }),
           Animated.timing(scale, {
             toValue: 1.75,
-            duration: 1000,
+            duration: 500,
             easing: Easing.ease,
             useNativeDriver: true,
           }),
@@ -35,13 +35,13 @@ const SplashScreen = () => {
         Animated.parallel([
           Animated.timing(rotation, {
             toValue: 0,
-            duration: 1000,
+            duration: 500,
             easing: Easing.ease,
             useNativeDriver: true,
           }),
           Animated.timing(scale, {
             toValue: 1,
-            duration: 1000,
+            duration: 500,
             easing: Easing.ease,
             useNativeDriver: true,
           }),
@@ -49,7 +49,7 @@ const SplashScreen = () => {
         // Fade out the image
         Animated.timing(opacity, {
           toValue: 0,
-          duration: 1000,
+          duration: 500,
           easing: Easing.linear,
           useNativeDriver: true,
         }),
@@ -70,7 +70,7 @@ const SplashScreen = () => {
 
   const rotateInterpolate = rotation.interpolate({
     inputRange: [0, 1],
-    outputRange: ["0deg", "-130deg"],
+    outputRange: ["0deg", "130deg"],
   });
 
   return (
