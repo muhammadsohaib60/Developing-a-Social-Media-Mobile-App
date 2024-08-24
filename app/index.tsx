@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Animated, Easing } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Import your images
-import { splash1, splash4 } from "../constants/images"; // Only splash1 and splash4 are needed
+import { splash1, splash4 } from "../constants/images";
 import { router } from "expo-router";
 
 const SplashScreen = () => {
@@ -11,7 +10,7 @@ const SplashScreen = () => {
   const opacity = useRef(new Animated.Value(1)).current;
   const scale = useRef(new Animated.Value(1)).current;
   const rotation = useRef(new Animated.Value(0)).current;
-  const images = [splash1, splash4]; // We only need the first and last images
+  const images = [splash1, splash4];
   const currentImageIndex = useRef(0);
 
   useEffect(() => {
@@ -46,22 +45,15 @@ const SplashScreen = () => {
             useNativeDriver: true,
           }),
         ]),
-        // Fade out the image
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 500,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
       ]).start(() => {
         // After splash1 animation, show splash4 and change background color
         currentImageIndex.current = 1;
         setBackgroundColor("#4B0082");
-        opacity.setValue(1); // Reset opacity for the next image
+        opacity.setValue(1);
 
         setTimeout(() => {
-          router.replace("/login");
-        }, 1000); // Adjust the delay as needed
+          router.push("/onboarding");
+        }, 1000);
       });
     };
 
