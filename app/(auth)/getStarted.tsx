@@ -33,7 +33,7 @@ const GetStarted = () => {
   const handleSubmit = () => {
     if (usernameAvailable) {
       // Navigate to the next screen if the username is available
-      router.push("/password");
+      router.push("/location");
     } else {
       // Handle the case where the username is not available
       alert("Please choose a different username.");
