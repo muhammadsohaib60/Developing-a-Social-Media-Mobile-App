@@ -24,7 +24,7 @@ const LoginSignup = () => {
         <CustomButton
           text="I am new here"
           handlePress={() => {
-            router.push({ pathname: "/sign-up" });
+            router.push({ pathname: "/phonenumber" });
           }}
           size={26}
         />

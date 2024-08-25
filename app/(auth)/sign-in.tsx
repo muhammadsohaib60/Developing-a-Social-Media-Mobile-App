@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/CustomButton";
 import Checkbox from "expo-checkbox";
 import { useRouter } from "expo-router";
+import Header from "@/components/Header";
 
 const SignIn = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
@@ -32,10 +33,7 @@ const SignIn = () => {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.heading1}>Sign in</Text>
-        <Text style={styles.heading2}>Let's connect to the tribe again</Text>
-      </View>
+      <Header heading1="Sign in" heading2="Let's connect to the tribe again" />
 
       <TextInput
         placeholder="Email / Phone Number"
@@ -81,22 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#4B008290",
     gap: 20,
   },
-  headerContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heading1: {
-    fontFamily: "ReemBold",
-    fontSize: 45,
-    color: "white",
-  },
-  heading2: {
-    fontFamily: "ReemRegular",
-    fontSize: 17,
-    color: "white",
-  },
+
   input: {
     backgroundColor: "white",
     width: "70%",
