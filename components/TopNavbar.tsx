@@ -1,4 +1,4 @@
-import { nav } from "@/constants/icons";
+import { message, nav } from "@/constants/icons";
 import { splash1 } from "@/constants/images";
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
@@ -10,39 +10,62 @@ const TopNavbar = () => {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
+        paddingHorizontal: 20,
       }}
     >
-      <Image
-        src={splash1}
-        alt="splash1"
-        style={{
-          width: 30,
-          height: 30,
-        }}
-      />
-      <View
-        style={{
-          flexDirection: "row",
-        }}
-      >
+      <View>
         <Image
-          src={nav}
+          source={splash1}
+          resizeMode="contain"
           style={{
-            width: 30,
-            height: 30,
+            width: 40,
+            height: 40,
+            marginTop: 20,
           }}
         />
+      </View>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 10,
+        }}
+      >
+        <View>
+          <Image
+            source={nav}
+            resizeMode="contain"
+            style={{
+              width: 30,
+              height: 30,
+              tintColor: "black",
+              marginTop: 20,
+            }}
+          />
+        </View>
         <Text
           style={{
             fontSize: 20,
-            fontFamily: "ReemSemiBold",
+            fontFamily: "ReemBold",
             color: "#000000",
             textAlign: "center",
             marginTop: 20,
           }}
         >
-          Tribe
+          Yoruba
         </Text>
+      </View>
+      <View>
+        <Image
+          source={message}
+          resizeMode="contain"
+          style={{
+            width: 30,
+            height: 30,
+            tintColor: "black",
+            marginTop: 20,
+          }}
+        />
       </View>
     </View>
   );

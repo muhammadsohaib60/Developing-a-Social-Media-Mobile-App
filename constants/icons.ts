@@ -4,5 +4,6 @@ const add = require("@/assets/icons/addIcon.png");
 const post = require("@/assets/icons/postIcon.png");
 const profile = require("@/assets/icons/profileIcon.png");
 const nav = require("@/assets/icons/navIcon.png");
+const message = require("@/assets/icons/messageIcon.png");
 
-export { home, flag, add, post, profile, nav };
+export { home, flag, add, post, profile, nav, message };

@@ -5,6 +5,7 @@ import { home, flag, add, post, profile, nav } from "@/constants/icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { splash1 } from "@/constants/images";
 import AddPostCard from "@/components/AddPostCard";
+import TopNavbar from "@/components/TopNavbar";
 
 const RootLayout = () => {
   const [show, setShow] = useState(false);
@@ -15,6 +16,7 @@ const RootLayout = () => {
         backgroundColor: "#FFFFFF",
       }}
     >
+      <TopNavbar />
       {show && <AddPostCard />}
       <Tabs
         screenOptions={{
