@@ -1,6 +1,7 @@
 import CustomButton from "@/components/CustomButton";
 import Header2 from "@/components/Header2";
 import Progress from "@/components/Progress";
+import { useGlobalContext } from "@/context/GlobalProvider";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
@@ -10,8 +11,16 @@ const University = () => {
   const [year, setYear] = useState<string>("");
   const [otherUniversity, setOtherUniversity] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
+  const { signUpData, setSignUpData } = useGlobalContext();
 
   const handleSubmit = () => {
+    setSignUpData({
+      ...signUpData,
+      university: university || otherUniversity,
+      universityYear: year,
+      department,
+    });
+
     router.push("/religion");
   };
 

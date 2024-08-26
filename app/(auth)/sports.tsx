@@ -4,9 +4,19 @@ import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Sports = () => {
+  const { signUpData, setSignUpData } = useGlobalContext();
+  const [sportsClub, setSportsClub] = useState<string>("");
+  const [otherSportsClub, setOtherSportsClub] = useState<string>("");
+
   const handleSubmit = () => {
+    setSignUpData({
+      ...signUpData,
+      sportsClub: sportsClub || otherSportsClub,
+    });
+
     router.push("/ethnic");
   };
 
@@ -25,10 +35,17 @@ const Sports = () => {
           justifyContent: "center",
         }}
       >
-        <TextInput placeholder="Choose Your Sports Club" style={styles.input} />
+        <TextInput
+          placeholder="Choose Your Sports Club"
+          style={styles.input}
+          value={sportsClub}
+          onChangeText={(text) => setSportsClub(text)}
+        />
         <TextInput
           placeholder="Enter Sports Club if not listed"
           style={styles.input}
+          value={otherSportsClub}
+          onChangeText={(text) => setOtherSportsClub(text)}
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

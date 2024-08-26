@@ -5,6 +5,7 @@ import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Location = () => {
   // State management for location data
@@ -13,6 +14,7 @@ const Location = () => {
   const [localGovernment, setLocalGovernment] = useState<string>("");
   const [neighborhood, setNeighborhood] = useState<string>("");
   const [otherNeighborhood, setOtherNeighborhood] = useState<string>("");
+  const { signUpData, setSignUpData } = useGlobalContext();
 
   const handleCountrySelect = (selectedCountry: any) => {
     setCountry(selectedCountry);
@@ -20,13 +22,14 @@ const Location = () => {
 
   const handleSubmit = () => {
     // Process the location data or navigate to the next screen
-    console.log({
-      country,
+    setSignUpData({
+      ...signUpData,
+      country: country?.name,
       state,
       localGovernment,
-      neighborhood,
-      otherNeighborhood,
+      neighborhood: neighborhood || otherNeighborhood,
     });
+
     router.push("/school");
   };
 

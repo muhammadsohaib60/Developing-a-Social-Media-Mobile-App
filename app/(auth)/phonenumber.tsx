@@ -6,19 +6,23 @@ import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import PhoneInput from "react-native-phone-number-input";
 import { router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const PhoneNumber = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const phoneInput = React.createRef<any>();
 
+  const { signUpData, setSignUpData } = useGlobalContext();
+
   const handleSubmit = () => {
     const isValid = phoneInput.current?.isValidNumber(phoneNumber);
     router.push("/password");
-    // if (isValid) {
-    //   router.push("/password");
-    // } else {
-    //   Alert.alert("Invalid Phone Number", "Please enter a valid phone number.");
-    // }
+    if (isValid) {
+      setSignUpData({ ...signUpData, phone: phoneNumber });
+      router.push("/password");
+    } else {
+      Alert.alert("Invalid Phone Number", "Please enter a valid phone number.");
+    }
   };
 
   return (

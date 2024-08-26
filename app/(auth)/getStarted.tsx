@@ -6,6 +6,7 @@ import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomPicker from "@/components/CustomPicker";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const dummyUsernames = ["john_doe", "jane_doe", "user123"];
 
@@ -23,6 +24,7 @@ const GetStarted = () => {
   ];
   const [username, setUsername] = useState("");
   const [usernameAvailable, setUsernameAvailable] = useState(true);
+  const { signUpData, setSignUpData } = useGlobalContext();
 
   useEffect(() => {
     // Simulate username validation
@@ -32,7 +34,15 @@ const GetStarted = () => {
 
   const handleSubmit = () => {
     if (usernameAvailable) {
-      // Navigate to the next screen if the username is available
+      setSignUpData({
+        ...signUpData,
+        username,
+        fullName,
+        email,
+        dateOfBirth,
+        gender
+      });
+
       router.push("/location");
     } else {
       // Handle the case where the username is not available

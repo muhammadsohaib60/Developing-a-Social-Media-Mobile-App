@@ -4,9 +4,20 @@ import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Christian = () => {
+  const { signUpData, setSignUpData } = useGlobalContext();
+  const [church, setChurch] = useState<string>("");
+  const [otherChurch, setOtherChurch] = useState<string>("");
+
   const handleSubmit = () => {
+    setSignUpData({
+      ...signUpData,
+      religion: "Christian",
+      religionSpecific: church || otherChurch,
+    });
+
     router.push("/politics");
   };
 
@@ -25,10 +36,17 @@ const Christian = () => {
           justifyContent: "center",
         }}
       >
-        <TextInput placeholder="Choose a Church" style={styles.input} />
+        <TextInput
+          placeholder="Choose a Church"
+          style={styles.input}
+          value={church}
+          onChangeText={(text) => setChurch(text)}
+        />
         <TextInput
           placeholder="Enter Church if not listed"
           style={styles.input}
+          value={otherChurch}
+          onChangeText={(text) => setOtherChurch(text)}
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

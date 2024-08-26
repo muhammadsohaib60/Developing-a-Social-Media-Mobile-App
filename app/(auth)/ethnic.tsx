@@ -4,9 +4,19 @@ import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Ethnic = () => {
+  const { signUpData, setSignUpData } = useGlobalContext();
+  const [tribe, setTribe] = useState<string>("");
+  const [otherTribe, setOtherTribe] = useState<string>("");
+
   const handleSubmit = () => {
+    setSignUpData({
+      ...signUpData,
+      ethnicTribe: tribe || otherTribe,
+    });
+
     router.push("/pictures");
   };
 
@@ -28,10 +38,14 @@ const Ethnic = () => {
         <TextInput
           placeholder="Choose Your Ethnic Tribe"
           style={styles.input}
+          value={tribe}
+          onChangeText={(text) => setTribe(text)}
         />
         <TextInput
           placeholder="Enter Ethnic Tribe if not listed"
           style={styles.input}
+          value={otherTribe}
+          onChangeText={(text) => setOtherTribe(text)}
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

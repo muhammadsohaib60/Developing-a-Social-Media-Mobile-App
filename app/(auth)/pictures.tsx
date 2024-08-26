@@ -13,9 +13,12 @@ import Progress from "@/components/Progress";
 import CustomButton from "@/components/CustomButton";
 import { router } from "expo-router";
 import { img_btn } from "@/constants/images";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { signup } from "@/utils/authMethods";
 
 const Pictures = () => {
   const [images, setImages] = useState<string[]>([]);
+  const { signUpData, setSignUpData } = useGlobalContext();
 
   // Function to pick images
   const pickImages = async () => {
@@ -39,8 +42,15 @@ const Pictures = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // You can process the selected images or navigate to the next screen
+  const handleSubmit = async () => {
+    // Save the images to the global context
+    setSignUpData({
+      ...signUpData,
+      images: images,
+    });
+
+    await signup(signUpData);
+
     router.push("/confirmation");
   };
 

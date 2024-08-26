@@ -4,9 +4,19 @@ import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Politics = () => {
+  const { signUpData, setSignUpData } = useGlobalContext();
+
+  const [party, setParty] = useState<string>("");
+  const [otherParty, setOtherParty] = useState<string>("");
+
   const handleSubmit = () => {
+    setSignUpData({
+      ...signUpData,
+      politicalParty: party || otherParty,
+    });
     router.push("/sports");
   };
 
@@ -25,10 +35,17 @@ const Politics = () => {
           justifyContent: "center",
         }}
       >
-        <TextInput placeholder="Choose Political Party" style={styles.input} />
+        <TextInput
+          placeholder="Choose Political Party"
+          style={styles.input}
+          value={party}
+          onChangeText={(text) => setParty(text)}
+        />
         <TextInput
           placeholder="Enter Political Party if not listed"
           style={styles.input}
+          value={otherParty}
+          onChangeText={(text) => setOtherParty(text)}
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

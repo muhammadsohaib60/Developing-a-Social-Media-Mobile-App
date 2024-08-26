@@ -11,13 +11,20 @@ import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const School = () => {
   const [school, setSchool] = useState<string>("");
   const [year, setYear] = useState<string>("");
   const [otherSchool, setOtherSchool] = useState<string>("");
+  const { signUpData, setSignUpData } = useGlobalContext();
 
   const handleSubmit = () => {
+    setSignUpData({
+      ...signUpData,
+      secondarySchool: school || otherSchool,
+      schoolYear: year,
+    });
     router.push("/university");
   };
 
