@@ -2,22 +2,14 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import GradientView from "@/components/GradientView";
 
-const Home = () => {
+const Search = () => {
   return (
     <GradientView>
-      <View>
-        <Text>SearchBar</Text>
-      </View>
-      <View>
-        <Text>Stories</Text>
-      </View>
-      <View>
-        <Text>Timeline</Text>
-      </View>
+      <Text>Search</Text>
     </GradientView>
   );
 };
 
-export default Home;
+export default Search;
 
 const styles = StyleSheet.create({});

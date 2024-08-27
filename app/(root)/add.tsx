@@ -1,11 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import GradientView from "@/components/GradientView";
 
 const Add = () => {
   return (
-    <View>
+    <GradientView>
       <Text>Add</Text>
-    </View>
+    </GradientView>
   );
 };
 

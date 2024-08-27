@@ -146,6 +146,12 @@ const RootLayout = () => {
             ),
           }}
         />
+        <Tabs.Screen
+          name="search"
+          options={{
+            tabBarButton: () => null,
+          }}
+        />
       </Tabs>
     </SafeAreaView>
   );
