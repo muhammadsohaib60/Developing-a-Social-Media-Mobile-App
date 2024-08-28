@@ -1,4 +1,4 @@
-import { user } from "./images";
+import { community, user } from "./images";
 
 export const setStories = () => {
   return [
@@ -124,4 +124,49 @@ export const setUsersInSearch = (tab: string) => {
       },
     ];
   }
+};
+
+export const setUser = () => {
+  return {
+    username: "MaaniObrick_121",
+    name: "Maani G63",
+    jobTitle: "Senior Software Developer",
+    tags: ["Reactjs", "Java", "Football"],
+    phone: "+2523 12321 1231",
+    email: "test@gmail.com",
+    profileImage: user, // Replace with actual image URL
+  };
+};
+
+export const setCommunities = () => {
+  return [
+    {
+      id: "1",
+      name: "React Developers",
+      imageUrl: community,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "2",
+      name: "Java Developers",
+      imageUrl: community,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "3",
+      name: "Football Lovers",
+      imageUrl: community,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "4",
+      name: "Software Engineers",
+      imageUrl: community,
+      posts: 123,
+      members: 123,
+    },
+  ];
 };

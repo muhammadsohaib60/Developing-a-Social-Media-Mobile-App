@@ -170,7 +170,7 @@ export const signin = async (emailOrPhone: string, password: string) => {
     //console.log('User signed in successfully:', user);
     return user;
   } catch (error) {
-    console.error('Error signing in:', error.message);
+    console.error('Error signing in:', (error as Error).message);
     throw error;
   }
 };

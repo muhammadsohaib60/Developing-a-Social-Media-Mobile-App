@@ -16,7 +16,7 @@ export interface signUpProps {
   universityYear: string;
   department: string;
   religion: string;
-  reigionSpecific: string;
+  religionSpecific: string;
   politicalParty: string;
   sportsClub: string;
   ethnicTribe: string;

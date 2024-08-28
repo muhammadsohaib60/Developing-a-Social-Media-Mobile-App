@@ -1,11 +1,14 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import React from "react";
 import GradientView from "@/components/GradientView";
+import UserProfile from "@/components/UserProfile";
+import Communities from "@/components/Communities";
 
 const Profile = () => {
   return (
     <GradientView>
-      <Text>Profile</Text>
+      <UserProfile />
+      <Communities />
     </GradientView>
   );
 };
