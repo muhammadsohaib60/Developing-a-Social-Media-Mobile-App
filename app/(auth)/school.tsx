@@ -60,23 +60,6 @@ const School = () => {
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />
       </View>
 
-      <TouchableOpacity
-        onPress={() => router.push("/university")}
-        style={{
-          position: "absolute",
-          bottom: 15,
-          left: 20,
-        }}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontFamily: "ReemRegular",
-          }}
-        >
-          Skip
-        </Text>
-      </TouchableOpacity>
       <Progress activeCircles={2} />
     </SafeAreaView>
   );
