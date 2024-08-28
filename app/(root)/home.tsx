@@ -1,16 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import GradientView from "@/components/GradientView";
+import HomeSearchBar from "@/components/HomeSearchBar";
+import StoryComponent from "@/components/StoryComponent";
 
 const Home = () => {
   return (
     <GradientView>
-      <View>
-        <Text>SearchBar</Text>
-      </View>
-      <View>
-        <Text>Stories</Text>
-      </View>
+      <HomeSearchBar />
+      <StoryComponent />
       <View>
         <Text>Timeline</Text>
       </View>

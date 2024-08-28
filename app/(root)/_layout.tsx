@@ -149,6 +149,7 @@ const RootLayout = () => {
         <Tabs.Screen
           name="search"
           options={{
+            headerShown: false,
             tabBarButton: () => null,
           }}
         />
