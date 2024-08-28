@@ -38,20 +38,14 @@ const Ethnic = () => {
         <TextInput
           placeholder="Choose Your Ethnic Tribe"
           style={styles.input}
-<<<<<<< HEAD
           value={tribe}
           onChangeText={(text) => setTribe(text)}
-=======
->>>>>>> 128a8cac9b9bcc6031ded2763586864c38b6290a
         />
         <TextInput
           placeholder="Enter Ethnic Tribe if not listed"
           style={styles.input}
-<<<<<<< HEAD
           value={otherTribe}
           onChangeText={(text) => setOtherTribe(text)}
-=======
->>>>>>> 128a8cac9b9bcc6031ded2763586864c38b6290a
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

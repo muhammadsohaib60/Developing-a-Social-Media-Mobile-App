@@ -35,7 +35,6 @@ const Politics = () => {
           justifyContent: "center",
         }}
       >
-<<<<<<< HEAD
         <TextInput
           placeholder="Choose Political Party"
           style={styles.input}
@@ -47,12 +46,6 @@ const Politics = () => {
           style={styles.input}
           value={otherParty}
           onChangeText={(text) => setOtherParty(text)}
-=======
-        <TextInput placeholder="Choose Political Party" style={styles.input} />
-        <TextInput
-          placeholder="Enter Political Party if not listed"
-          style={styles.input}
->>>>>>> 128a8cac9b9bcc6031ded2763586864c38b6290a
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

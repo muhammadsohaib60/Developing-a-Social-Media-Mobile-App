@@ -36,7 +36,6 @@ const Christian = () => {
           justifyContent: "center",
         }}
       >
-<<<<<<< HEAD
         <TextInput
           placeholder="Choose a Church"
           style={styles.input}
@@ -48,12 +47,6 @@ const Christian = () => {
           style={styles.input}
           value={otherChurch}
           onChangeText={(text) => setOtherChurch(text)}
-=======
-        <TextInput placeholder="Choose a Church" style={styles.input} />
-        <TextInput
-          placeholder="Enter Church if not listed"
-          style={styles.input}
->>>>>>> 128a8cac9b9bcc6031ded2763586864c38b6290a
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />
