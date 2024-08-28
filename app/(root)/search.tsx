@@ -1,11 +1,26 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import GradientView from "@/components/GradientView";
+import SearchBar from "@/components/SearchBar";
+import TabNavigation from "@/components/TabNavigation";
+import UserList from "@/components/SearchUserList";
 
 const Search = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTab, setSelectedTab] = useState("Accounts");
+
+  const handleSearch = () => {
+    console.log("Searching for:", searchQuery);
+  };
   return (
     <GradientView>
-      <Text>Search</Text>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        onSearch={handleSearch}
+      />
+      <TabNavigation selectedTab={selectedTab} onSelectTab={setSelectedTab} />
+      <UserList tab={selectedTab} />
     </GradientView>
   );
 };
