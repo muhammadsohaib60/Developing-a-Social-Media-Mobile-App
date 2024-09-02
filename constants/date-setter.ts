@@ -1,4 +1,4 @@
-import { community, user } from "./images";
+import { community, post, user } from "./images";
 
 export const setStories = () => {
   return [
@@ -167,6 +167,172 @@ export const setCommunities = () => {
       imageUrl: community,
       posts: 123,
       members: 123,
+    },
+  ];
+};
+
+export const setFlags = () => {
+  return [
+    {
+      img: community,
+      msg: "You liked Ocama's post",
+      caption: "Party All night, it was crazy!!!!",
+      id: "1",
+    },
+    {
+      img: community,
+      msg: "You liked Ocama's post",
+      caption: "Party All night, it was crazy!!!!",
+      id: "2",
+    },
+    {
+      img: community,
+      msg: "You liked Ocama's post",
+      caption: "Party All night, it was crazy!!!!",
+      id: "3",
+    },
+    {
+      img: community,
+      msg: "You liked Ocama's post",
+      caption: "Party All night, it was crazy!!!!",
+      id: "4",
+    },
+    {
+      img: community,
+      msg: "You liked Ocama's post",
+      caption: "Party All night, it was crazy!!!!",
+      id: "5",
+    },
+    {
+      img: community,
+      msg: "You liked Ocama's post",
+      caption: "Party All night, it was crazy!!!!",
+      id: "6",
+    },
+    {
+      img: community,
+      msg: "You liked Ocama's post",
+      caption: "Party All night, it was crazy!!!!",
+      id: "7",
+    },
+  ];
+};
+
+export const setChats = () => {
+  return [
+    {
+      id: "1",
+      name: "Maani",
+      lastMessage: "Hello, how are you?",
+      imageUrl: user,
+    },
+    {
+      id: "2",
+      name: "Aimon",
+      lastMessage: "Hello, how are you?",
+      imageUrl: user,
+    },
+    {
+      id: "3",
+      name: "Alisa",
+      lastMessage: "Hello, how are you?",
+      imageUrl: user,
+    },
+    {
+      id: "4",
+      name: "Monte",
+      lastMessage: "Hello, how are you?",
+      imageUrl: user,
+    },
+  ];
+};
+
+export const setChatUser = () => {
+  return {
+    name: "Maani",
+    username: "MaaniObrick_121",
+    profileImage: user,
+    id: "1",
+  };
+};
+
+export const setMessages = () => {
+  return [
+    {
+      id: "1",
+      message: "Hello, how are you?",
+      senderId: "1",
+    },
+    {
+      id: "2",
+      message: "I am fine, how about you?",
+      senderId: "2",
+    },
+    {
+      id: "3",
+      message: "I am also good",
+
+      senderId: "1",
+    },
+    {
+      id: "4",
+      message: "What are you doing?",
+      senderId: "2",
+    },
+    {
+      id: "5",
+      message: "Nothing much, just chilling",
+      senderId: "1",
+    },
+    {
+      id: "6",
+      message: "That's great",
+      senderId: "2",
+    },
+  ];
+};
+
+export const setPost = () => {
+  return [
+    {
+      id: "1",
+      user: {
+        name: "Maani",
+        profileImage: user,
+      },
+
+      postMedia: [post, user, community],
+      caption: "Party All night, it was crazy!!!!",
+    },
+    {
+      id: "2",
+      user: {
+        name: "Maani",
+        profileImage: user,
+      },
+
+      postMedia: [post],
+      caption: "Party All night, it was crazy!!!!",
+    },
+    {
+      id: "3",
+      user: {
+        name: "Maani",
+        profileImage: user,
+      },
+
+      postMedia: [post],
+      caption: "Party All night, it was crazy!!!!",
+    },
+    {
+      id: "4",
+      user: {
+        name: "Maani",
+        profileImage: user,
+      },
+
+      postMedia: [post, post, post],
+      caption: "Party All night, it was crazy!!!!",
     },
   ];
 };

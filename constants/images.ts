@@ -6,6 +6,7 @@ const onboarding = require("../assets/images/onboarding.png");
 const img_btn = require("../assets/images/img_btn.png");
 const user = require("../assets/images/user.png");
 const community = require("../assets/images/community.png");
+const post = require("../assets/images/post.png");
 
 export {
   splash1,
@@ -16,4 +17,5 @@ export {
   img_btn,
   user,
   community,
+  post,
 };

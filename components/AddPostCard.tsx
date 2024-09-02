@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { router } from "expo-router";
 
 const AddPostCard = () => {
   return (
@@ -22,6 +23,7 @@ const AddPostCard = () => {
           padding: 10,
           paddingHorizontal: 40,
         }}
+        onPress={() => router.push("/addpost")}
       >
         <Text
           style={{
@@ -37,6 +39,7 @@ const AddPostCard = () => {
           padding: 10,
           paddingHorizontal: 40,
         }}
+        onPress={() => router.push("/addstory")}
       >
         <Text
           style={{
