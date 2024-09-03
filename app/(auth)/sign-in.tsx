@@ -6,19 +6,41 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/CustomButton";
 import Checkbox from "expo-checkbox";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
 import { signin } from "@/utils/authMethods";
+import { signupDataManager } from "./SignupDataManager"; // Import the SignupDataManager
 
 const SignIn = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [isRemembered, setIsRemembered] = useState(false);
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetchRegionalData();
+  }, []);
+
+  const fetchRegionalData = async () => {
+    try {
+      setIsLoading(true);
+      await signupDataManager.fetchRegionalData();
+
+      const regionalData = signupDatadManager.getRegionalData();
+        
+        console.log('Full Regional Data:', JSON.stringify(regionalData, null, 2));
+    } catch (error) {
+      console.error("Error fetching regional data:", error);
+      Alert.alert("Error", "Failed to fetch regional data. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSignIn = async () => {
     try {

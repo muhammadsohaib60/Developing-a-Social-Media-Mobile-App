@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { signupDataManager } from './SignupDataManager';
 import {
   SafeAreaView,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   View,
-  Text,
 } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
@@ -13,11 +12,46 @@ import Header2 from "@/components/Header2";
 import { router } from "expo-router";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
+interface Country {
+  callingCode: string[];
+  cca2: string;
+  currency: string[];
+  flag: string;
+  name: string;
+  region: string;
+  subregion: string;
+}
+
 const School = () => {
   const [school, setSchool] = useState<string>("");
   const [year, setYear] = useState<string>("");
   const [otherSchool, setOtherSchool] = useState<string>("");
   const { signUpData, setSignUpData } = useGlobalContext();
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [countrySpecificData, setCountrySpecificData] = useState<any>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await signupDataManager.loadSignupData();
+        const locationData = signupDataManager.getLocationData();
+        if (locationData && locationData.country) {
+          setSelectedCountry(locationData.country);
+          console.log("Selected country in the school:", locationData.country);
+          
+          const specificData = await signupDataManager.fetchCountrySpecificData(locationData.country.name);
+          setCountrySpecificData(specificData);
+          console.log("Country-specific data:", specificData);
+        } else {
+          console.log("No country data found");
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleSubmit = () => {
     setSignUpData({
@@ -90,19 +124,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 10,
     marginBottom: 10,
-  },
-  inputContainer: {
-    width: 180,
-    borderRadius: 50,
-    overflow: "hidden",
-  },
-  pickerButton: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 50,
-    alignItems: "center",
-    color: "#969696",
-    fontFamily: "ReemRegular",
   },
   input: {
     backgroundColor: "white",
