@@ -153,6 +153,34 @@ const RootLayout = () => {
             tabBarButton: () => null,
           }}
         />
+        <Tabs.Screen
+          name="chat"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+          }}
+        />
+        <Tabs.Screen
+          name="single-chat"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+          }}
+        />
+        <Tabs.Screen
+          name="addpost"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+          }}
+        />
+        <Tabs.Screen
+          name="addstory"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+          }}
+        />
       </Tabs>
     </SafeAreaView>
   );

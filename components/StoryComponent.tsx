@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { setStories } from "@/constants/date-setter";
+import { router } from "expo-router";
 
 const dummyStories = setStories();
 
@@ -16,7 +17,10 @@ const StoryComponent = () => {
   const renderItem = ({ item }: any) => {
     if (item.isAddNew) {
       return (
-        <TouchableOpacity style={styles.storyContainer}>
+        <TouchableOpacity
+          style={styles.storyContainer}
+          onPress={() => router.push("/addstory")}
+        >
           <LinearGradient
             colors={["#FFD700", "#FFD700"]}
             style={styles.storyCircle}

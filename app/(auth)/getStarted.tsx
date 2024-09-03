@@ -40,7 +40,7 @@ const GetStarted = () => {
         fullName,
         email,
         dateOfBirth,
-        gender
+        gender,
       });
 
       router.push("/location");
