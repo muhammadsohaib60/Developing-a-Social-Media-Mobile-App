@@ -1,10 +1,8 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { setUser } from "@/constants/date-setter";
-import { router } from "expo-router";
 
-const UserProfile = () => {
+const OtherProfile = () => {
   const user = setUser();
 
   return (
@@ -28,20 +26,6 @@ const UserProfile = () => {
         </View>
 
         <Image source={user.profileImage} style={styles.profileImage} />
-      </View>
-      <View
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-        }}
-      >
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/userposts")}
-        >
-          <Text style={styles.buttonText}>My Posts</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -120,4 +104,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserProfile;
+export default OtherProfile;

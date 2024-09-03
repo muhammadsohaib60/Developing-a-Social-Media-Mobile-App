@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -20,11 +21,15 @@ import { signup, uploadImagesAndUpdateUser } from "@/utils/authMethods";
 const Pictures = () => {
   const [images, setImages] = useState<string[]>([]);
   const { signUpData, setSignUpData } = useGlobalContext();
+  const [loading, setLoading] = useState(false);
 
   const pickImages = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission needed", "Sorry, we need camera roll permissions to make this work!");
+      Alert.alert(
+        "Permission needed",
+        "Sorry, we need camera roll permissions to make this work!"
+      );
       return;
     }
 
@@ -43,32 +48,44 @@ const Pictures = () => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       const newUser = await signup({
         ...signUpData,
-        profile_pictures: []
+        profile_pictures: [],
       });
-  
+
       if (newUser && newUser.user_id) {
-        const result = await uploadImagesAndUpdateUser(newUser.user_id, images, signUpData.username);
-        
+        const result = await uploadImagesAndUpdateUser(
+          newUser.user_id,
+          images,
+          signUpData.username
+        );
+
         if (result.failedUploads > 0) {
           Alert.alert(
-            'Partial Success',
+            "Partial Success",
             `User created successfully, but ${result.failedUploads} image(s) failed to upload. You can try uploading them later.`
           );
         } else {
-          Alert.alert('Success', 'User created and all images uploaded successfully!');
+          Alert.alert(
+            "Success",
+            "User created and all images uploaded successfully!"
+          );
         }
-        
+
         router.push("/confirmation");
       } else {
-        throw new Error('User creation failed or user ID is missing');
+        throw new Error("User creation failed or user ID is missing");
       }
     } catch (error) {
-      console.error('Error during signup or image upload:', error);
-      Alert.alert('Error', 'There was an error during the signup process. Please try again.');
+      console.error("Error during signup or image upload:", error);
+      Alert.alert(
+        "Error",
+        "There was an error during the signup process. Please try again."
+      );
     }
+    setLoading(false);
   };
   return (
     <SafeAreaView style={styles.screen}>
@@ -77,10 +94,7 @@ const Pictures = () => {
         heading2="You can add up to 5 photos."
       />
       <View style={styles.container}>
-        <TouchableOpacity
-          onPress={pickImages}
-          style={styles.pickButton}
-        >
+        <TouchableOpacity onPress={pickImages} style={styles.pickButton}>
           <Image source={img_btn} />
         </TouchableOpacity>
 
@@ -94,7 +108,11 @@ const Pictures = () => {
           ))}
         </ScrollView>
 
-        <CustomButton size={18} text="Next" handlePress={handleSubmit} />
+        {!loading ? (
+          <CustomButton size={18} text="Next" handlePress={handleSubmit} />
+        ) : (
+          <ActivityIndicator size="large" color="yellow" />
+        )}
       </View>
 
       <Progress activeCircles={3} />

@@ -31,7 +31,10 @@ const StoryComponent = () => {
       );
     } else {
       return (
-        <TouchableOpacity style={styles.storyContainer}>
+        <TouchableOpacity
+          style={styles.storyContainer}
+          onPress={() => router.push("/stories")}
+        >
           <LinearGradient
             colors={["#FFD700", "#FFD700"]}
             style={styles.storyCircle}

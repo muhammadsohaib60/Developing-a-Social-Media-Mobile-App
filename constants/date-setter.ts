@@ -300,8 +300,11 @@ export const setPost = () => {
         name: "Maani",
         profileImage: user,
       },
-
-      postMedia: [post, user, community],
+      postMedia: [
+        { src: post, type: "image" },
+        { src: post, type: "image" },
+        { src: community, type: "image" },
+      ],
       caption: "Party All night, it was crazy!!!!",
     },
     {
@@ -310,9 +313,11 @@ export const setPost = () => {
         name: "Maani",
         profileImage: user,
       },
-
-      postMedia: [post],
-      caption: "Party All night, it was crazy!!!!",
+      postMedia: [
+        { src: post, type: "image" },
+        { src: require("../assets/videos/story1.mp4"), type: "video" },
+      ],
+      caption: "Awesome vibes!",
     },
     {
       id: "3",
@@ -320,9 +325,11 @@ export const setPost = () => {
         name: "Maani",
         profileImage: user,
       },
-
-      postMedia: [post],
-      caption: "Party All night, it was crazy!!!!",
+      postMedia: [
+        { src: post, type: "image" },
+        { src: require("../assets/videos/story1.mp4"), type: "video" },
+      ],
+      caption: "Unforgettable moments!",
     },
     {
       id: "4",
@@ -330,9 +337,41 @@ export const setPost = () => {
         name: "Maani",
         profileImage: user,
       },
+      postMedia: [
+        { src: post, type: "image" },
+        { src: post, type: "image" },
+        { src: require("../assets/videos/story1.mp4"), type: "video" },
+      ],
+      caption: "Just another night out!",
+    },
+  ];
+};
 
-      postMedia: [post, post, post],
-      caption: "Party All night, it was crazy!!!!",
+export const setStories2 = () => {
+  return [
+    {
+      type: "image",
+      source: require("../assets/images/community.png"),
+      user: {
+        name: "John Doe",
+        profileImage: require("../assets/images/user.png"),
+      },
+    },
+    {
+      type: "video",
+      source: require("../assets/videos/story1.mp4"),
+      user: {
+        name: "Jane Smith",
+        profileImage: require("../assets/images/user.png"),
+      },
+    },
+    {
+      type: "image",
+      source: require("../assets/images/community.png"),
+      user: {
+        name: "Alice Johnson",
+        profileImage: require("../assets/images/user.png"),
+      },
     },
   ];
 };

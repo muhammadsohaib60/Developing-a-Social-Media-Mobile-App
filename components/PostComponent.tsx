@@ -9,9 +9,12 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  Share,
 } from "react-native";
+import { ResizeMode, Video } from "expo-av";
 import { comment, like, share } from "@/constants/icons";
 import { user } from "@/constants/images";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -36,6 +39,26 @@ const PostComponent = ({ post }: any) => {
   ]);
   const [reactionModalVisible, setReactionModalVisible] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState(null);
+
+  const sharePost = async () => {
+    try {
+      const result = await Share.share({
+        message: "post link here",
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log("Shared with activity type: ", result.activityType);
+        } else {
+          console.log("Content shared successfully");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Content sharing dismissed");
+      }
+    } catch (error) {
+      console.error("Error sharing content: ", error);
+    }
+  };
 
   const onScroll = (event: any) => {
     const slideIndex = Math.ceil(
@@ -72,7 +95,10 @@ const PostComponent = ({ post }: any) => {
   return (
     <View style={styles.postContainer}>
       <View style={styles.header}>
-        <Image source={post.user.profileImage} style={styles.profileImage} />
+        <TouchableOpacity onPress={() => router.push("/otherprofile")}>
+          <Image source={post.user.profileImage} style={styles.profileImage} />
+        </TouchableOpacity>
+
         <Text style={styles.userName}>{post.user.name}</Text>
       </View>
       <Text style={styles.caption}>{post.caption}</Text>
@@ -86,12 +112,23 @@ const PostComponent = ({ post }: any) => {
         contentContainerStyle={styles.mediaContainer}
       >
         {post.postMedia.map((media: any, index: any) => (
-          <Image
-            key={index}
-            source={media}
-            style={styles.media}
-            resizeMode="contain"
-          />
+          <View key={index} style={styles.mediaWrapper}>
+            {media.type === "image" ? (
+              <Image
+                source={media.src}
+                style={styles.media}
+                resizeMode="contain"
+              />
+            ) : (
+              <Video
+                source={media.src}
+                style={styles.media}
+                resizeMode={ResizeMode.CONTAIN}
+                shouldPlay
+                isLooping
+              />
+            )}
+          </View>
         ))}
       </ScrollView>
       <View style={styles.pagination}>
@@ -112,7 +149,9 @@ const PostComponent = ({ post }: any) => {
         <TouchableOpacity onPress={toggleComments}>
           <Image source={comment} style={styles.icon} />
         </TouchableOpacity>
-        <Image source={share} style={styles.icon} />
+        <TouchableOpacity onPress={sharePost}>
+          <Image source={share} style={styles.icon} />
+        </TouchableOpacity>
       </View>
 
       {showComments && (
@@ -209,10 +248,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  media: {
+  mediaWrapper: {
     width: width - 64,
     height: 200,
     borderRadius: 12,
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  media: {
+    width: "100%",
+    height: "100%",
   },
   pagination: {
     flexDirection: "row",
@@ -283,7 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   addButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#4B0082",
     padding: 8,
     borderRadius: 8,
     alignItems: "center",

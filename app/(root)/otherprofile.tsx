@@ -1,15 +1,18 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import GradientView from "@/components/GradientView";
+import UserProfile from "@/components/OtherProfile";
+import Posts from "@/components/Posts";
 
-const Add = () => {
+const OtherProfile = () => {
   return (
     <GradientView>
-      <Text>Add</Text>
+      <UserProfile />
+      <Posts />
     </GradientView>
   );
 };
 
-export default Add;
+export default OtherProfile;
 
 const styles = StyleSheet.create({});

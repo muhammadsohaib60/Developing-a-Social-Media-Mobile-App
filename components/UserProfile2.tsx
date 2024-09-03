@@ -38,9 +38,9 @@ const UserProfile = () => {
       >
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push("/userposts")}
+          onPress={() => router.push("/profile")}
         >
-          <Text style={styles.buttonText}>My Posts</Text>
+          <Text style={styles.buttonText}>My Communities</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -109,8 +109,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     alignItems: "center",
-
-    width: 100,
+    width: 120,
     alignSelf: "flex-end",
   },
   buttonText: {

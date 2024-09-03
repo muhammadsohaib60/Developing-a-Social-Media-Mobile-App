@@ -51,7 +51,7 @@ const RootLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="add"
+          name="search"
           options={{
             headerShown: false,
             title: "Add",
@@ -146,13 +146,7 @@ const RootLayout = () => {
             ),
           }}
         />
-        <Tabs.Screen
-          name="search"
-          options={{
-            headerShown: false,
-            tabBarButton: () => null,
-          }}
-        />
+
         <Tabs.Screen
           name="chat"
           options={{
@@ -176,6 +170,27 @@ const RootLayout = () => {
         />
         <Tabs.Screen
           name="addstory"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+          }}
+        />
+        <Tabs.Screen
+          name="stories"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+          }}
+        />
+        <Tabs.Screen
+          name="otherprofile"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+          }}
+        />
+        <Tabs.Screen
+          name="userposts"
           options={{
             headerShown: false,
             tabBarButton: () => null,
