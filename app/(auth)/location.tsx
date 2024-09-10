@@ -82,24 +82,41 @@ const styles = StyleSheet.create({
 const Location = () => {
   const [country, setCountry] = useState<Country | null>(null);
   const [state, setState] = useState<string>("");
+  const [states, setStates] = useState<string[]>([]);
   const [localGovernment, setLocalGovernment] = useState<string>("");
   const [neighborhood, setNeighborhood] = useState<string>("");
   const [otherNeighborhood, setOtherNeighborhood] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   
+  //fetched states, you will fetch all other similar
+  const fetchStates = async (countryName: string) => {
+    try {
+      const fetchedStates = await signupDataManager.fetchStates(countryName);
+      setStates(fetchedStates);
+      console.log("Fetched states:", fetchedStates);
+    } catch (err) {
+      console.error("Error fetching states:", err);
+      setError("Failed to fetch states. Please try again.");
+    }
+  };
 
   const handleCountrySelect = async (selectedCountry: Country) => {
     console.log("Selected country:", selectedCountry);
     setCountry(selectedCountry);
+    setState(""); // Reset state when country changes
+    setStates([]); // Clear previous states
 
     try {
       await signupDataManager.setLocationData({
         country: selectedCountry,
-        state,
+        state: "",
         localGovernment,
         neighborhood: neighborhood || otherNeighborhood,
       });
       console.log("Location data saved:", await signupDataManager.getLocationData());
+      
+      // Fetch states for the selected country
+      await fetchStates(selectedCountry.name);
     } catch (err) {
       console.error("Error saving location data:", err);
       setError("Failed to save location data. Please try again.");
@@ -107,13 +124,12 @@ const Location = () => {
   };
 
   const handleSubmit = () => {
-    if (country) {
+    if (country && state) {
       router.push("/school");
     } else {
-      setError("Please select a country before proceeding.");
+      setError("Please select a country and state before proceeding.");
     }
   };
-
   return (
     <SafeAreaView style={styles.screen}>
       <Header2
