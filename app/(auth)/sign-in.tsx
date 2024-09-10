@@ -20,27 +20,6 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [isRemembered, setIsRemembered] = useState(false);
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    fetchRegionalData();
-  }, []);
-
-  const fetchRegionalData = async () => {
-    try {
-      setIsLoading(true);
-      await signupDataManager.fetchRegionalData();
-
-      const regionalData = signupDatadManager.getRegionalData();
-        
-        console.log('Full Regional Data:', JSON.stringify(regionalData, null, 2));
-    } catch (error) {
-      console.error("Error fetching regional data:", error);
-      Alert.alert("Error", "Failed to fetch regional data. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleSignIn = async () => {
     try {

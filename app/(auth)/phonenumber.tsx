@@ -1,5 +1,5 @@
 import { StyleSheet, View, Alert } from "react-native";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "@/components/Header";
 import CustomButton from "@/components/CustomButton";
@@ -7,12 +7,34 @@ import Progress from "@/components/Progress";
 import PhoneInput from "react-native-phone-number-input";
 import { router } from "expo-router";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { signupDataManager } from './SignupDataManager';
 
 const PhoneNumber = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const phoneInput = React.createRef<any>();
 
   const { signUpData, setSignUpData } = useGlobalContext();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetchRegionalData();
+  }, []);
+
+  const fetchRegionalData = async () => {
+    try {
+      setIsLoading(true);
+      await signupDataManager.fetchRegionalData();
+
+      const regionalData = signupDataManager.getRegionalData();
+        
+        console.log('Full Regional Data:', JSON.stringify(regionalData, null, 2));
+    } catch (error) {
+      console.error("Error fetching regional data:", error);
+      Alert.alert("Error", "Failed to fetch regional data. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = () => {
     const isValid = phoneInput.current?.isValidNumber(phoneNumber);
