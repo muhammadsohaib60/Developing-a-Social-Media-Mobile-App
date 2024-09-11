@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { signupDataManager } from './SignupDataManager';
-import {
-  SafeAreaView,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { signupDataManager } from "./SignupDataManager";
+import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
@@ -26,7 +21,7 @@ const School = () => {
   const [school, setSchool] = useState<string>("");
   const [year, setYear] = useState<string>("");
   const [otherSchool, setOtherSchool] = useState<string>("");
-  const { signUpData, setSignUpData } = useGlobalContext();
+  const { signUpData, setSignUpData, setCountryData } = useGlobalContext();
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [countrySpecificData, setCountrySpecificData] = useState<any>(null);
 
@@ -38,9 +33,13 @@ const School = () => {
         if (locationData && locationData.country) {
           setSelectedCountry(locationData.country);
           console.log("Selected country in the school:", locationData.country);
-          
-          const specificData = await signupDataManager.fetchCountrySpecificData(locationData.country.name);
+
+          const specificData = await signupDataManager.fetchCountrySpecificData(
+            locationData.country.name
+          );
           setCountrySpecificData(specificData);
+          setCountryData(specificData);
+
           console.log("Country-specific data:", specificData);
         } else {
           console.log("No country data found");

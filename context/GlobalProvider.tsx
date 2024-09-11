@@ -30,11 +30,15 @@ const GlobalProvider = ({ children }: any) => {
     imagesUri: [],
   });
 
+  const [countryData, setCountryData] = useState<any>(null);
+
   return (
     <GlobalContext.Provider
       value={{
         signUpData,
         setSignUpData,
+        countryData,
+        setCountryData,
       }}
     >
       {children}

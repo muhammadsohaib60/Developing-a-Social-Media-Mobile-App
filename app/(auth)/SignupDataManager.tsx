@@ -1,6 +1,6 @@
-import { supabase } from '../../supabaseClient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Session } from '@supabase/supabase-js';
+import { supabase } from "../../supabaseClient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Session } from "@supabase/supabase-js";
 
 interface Country {
   callingCode: string[];
@@ -28,10 +28,10 @@ interface CountrySpecificData {
 }
 
 interface RegionalData {
-    states: any[];
-    localGovernments: any[];
-    neighborhoods: any[];
-  }
+  states: any[];
+  localGovernments: any[];
+  neighborhoods: any[];
+}
 interface SignupData {
   location: LocationData | null;
   countrySpecificData: CountrySpecificData | null;
@@ -73,16 +73,16 @@ class SignupDataManager {
 
     try {
       const { data, error } = await supabase
-        .from('reg_Country')
-        .select('country_name')
-        .order('country_name', { ascending: true });
+        .from("reg_Country")
+        .select("country_name")
+        .order("country_name", { ascending: true });
 
       if (error) throw error;
 
-      this.countries = data.map(country => country.country_name);
+      this.countries = data.map((country) => country.country_name);
       return this.countries;
     } catch (error) {
-      console.error('Error fetching countries:', error);
+      console.error("Error fetching countries:", error);
       throw error;
     }
   }
@@ -96,26 +96,37 @@ class SignupDataManager {
     return this.signupData.location;
   }
 
-  async fetchCountrySpecificData(countryName: string): Promise<CountrySpecificData> {
+  async fetchCountrySpecificData(
+    countryName: string
+  ): Promise<CountrySpecificData> {
     console.log(`Fetching country-specific data for: ${countryName}`);
     try {
       const { data: countryData, error: countryError } = await supabase
-        .from('reg_Country')
-        .select('country_name')
-        .eq('country_name', countryName)
+        .from("reg_Country")
+        .select("country_name")
+        .eq("country_name", countryName)
         .single();
 
       if (countryError || !countryData) {
-        console.error(`Country "${countryName}" not found in the database:`, countryError);
+        console.error(
+          `Country "${countryName}" not found in the database:`,
+          countryError
+        );
         throw new Error(`Country "${countryName}" not found in the database`);
       }
 
-      const [churches, ethnicGroups, politicalParties, sportsClubs, universities] = await Promise.all([
-        this.fetchDataFromTable('reg_churches', 'church_name', countryName),
-        this.fetchDataFromTable('ethnic_groups', 'ethnic_name', countryName),
-        this.fetchDataFromTable('political_parties', 'party_name', countryName),
-        this.fetchDataFromTable('reg_sports_club', 'club_name', countryName),
-        this.fetchDataFromTable('reg_universities', 'uni_name', countryName)
+      const [
+        churches,
+        ethnicGroups,
+        politicalParties,
+        sportsClubs,
+        universities,
+      ] = await Promise.all([
+        this.fetchDataFromTable("reg_churches", "church_name", countryName),
+        this.fetchDataFromTable("ethnic_groups", "ethnic_name", countryName),
+        this.fetchDataFromTable("political_parties", "party_name", countryName),
+        this.fetchDataFromTable("reg_sports_club", "club_name", countryName),
+        this.fetchDataFromTable("reg_universities", "uni_name", countryName),
       ]);
 
       const countrySpecificData: CountrySpecificData = {
@@ -123,17 +134,17 @@ class SignupDataManager {
         ethnicGroups,
         politicalParties,
         sportsClubs,
-        universities
+        universities,
       };
 
-      console.log('Fetched country-specific data:', countrySpecificData);
+      console.log("Fetched country-specific data:", countrySpecificData);
 
       this.signupData.countrySpecificData = countrySpecificData;
       await this.saveSignupData();
 
       return countrySpecificData;
     } catch (error) {
-      console.error('Error fetching country-specific data:', error);
+      console.error("Error fetching country-specific data:", error);
       throw error;
     }
   }
@@ -141,25 +152,25 @@ class SignupDataManager {
   async fetchRegionalData(): Promise<void> {
     try {
       const [states, localGovernments, neighborhoods] = await Promise.all([
-        this.fetchRegionalDataFromTable('reg_state'),
-        this.fetchRegionalDataFromTable('reg_local_government'),
-        this.fetchRegionalDataFromTable('reg_neighborhood')
+        this.fetchRegionalDataFromTable("reg_state"),
+        this.fetchRegionalDataFromTable("reg_local_government"),
+        this.fetchRegionalDataFromTable("reg_neighborhood"),
       ]);
 
       this.signupData.regionalData = {
         states,
         localGovernments,
-        neighborhoods
+        neighborhoods,
       };
 
       await this.saveSignupData();
-      console.log('Regional data fetched and saved successfully');
+      console.log("Regional data fetched and saved successfully");
     } catch (error) {
-      console.error('Error fetching regional data:', error);
+      console.error("Error fetching regional data:", error);
       this.signupData.regionalData = {
         states: [],
         localGovernments: [],
-        neighborhoods: []
+        neighborhoods: [],
       };
       await this.saveSignupData();
     }
@@ -168,21 +179,21 @@ class SignupDataManager {
   async fetchRegionalData(countryName: string): Promise<void> {
     try {
       const states = await this.fetchStates(countryName);
-      
+
       this.signupData.regionalData = {
         states,
         localGovernments: [],
-        neighborhoods: []
+        neighborhoods: [],
       };
 
       await this.saveSignupData();
-      console.log('Regional data fetched and saved successfully');
+      console.log("Regional data fetched and saved successfully");
     } catch (error) {
-      console.error('Error fetching regional data:', error);
+      console.error("Error fetching regional data:", error);
       this.signupData.regionalData = {
         states: [],
         localGovernments: [],
-        neighborhoods: []
+        neighborhoods: [],
       };
       await this.saveSignupData();
     }
@@ -192,22 +203,22 @@ class SignupDataManager {
     console.log(`Fetching states for country: ${countryName}`);
     try {
       const { data, error } = await supabase
-        .from('reg_state')
-        .select('state_name')
-        .eq('country_name', countryName);
+        .from("reg_state")
+        .select("state_name")
+        .eq("country_name", countryName);
 
       if (error) throw error;
 
-      const states = data.map(state => state.state_name);
+      const states = data.map((state) => state.state_name);
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
-        states
+        states,
       };
       await this.saveSignupData();
 
       return states;
     } catch (error) {
-      console.error('Error fetching states:', error);
+      console.error("Error fetching states:", error);
       return [];
     }
   }
@@ -216,67 +227,77 @@ class SignupDataManager {
     console.log(`Fetching local governments for state: ${stateName}`);
     try {
       const { data, error } = await supabase
-        .from('reg_local_government')
-        .select('local_gov_name')
-        .eq('state_name', stateName);
+        .from("reg_local_government")
+        .select("local_gov_name")
+        .eq("state_name", stateName);
 
       if (error) throw error;
 
-      const localGovernments = data.map(lg => lg.local_gov_name);
+      const localGovernments = data.map((lg) => lg.local_gov_name);
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
-        localGovernments
+        localGovernments,
       };
       await this.saveSignupData();
 
       return localGovernments;
     } catch (error) {
-      console.error('Error fetching local governments:', error);
+      console.error("Error fetching local governments:", error);
       return [];
     }
   }
 
   async fetchNeighborhoods(localGovernmentName: string): Promise<string[]> {
-    console.log(`Fetching neighborhoods for local government: ${localGovernmentName}`);
+    console.log(
+      `Fetching neighborhoods for local government: ${localGovernmentName}`
+    );
     try {
       const { data, error } = await supabase
-        .from('reg_neighborhood')
-        .select('neighborhood_name')
-        .eq('local_gov_name', localGovernmentName);
+        .from("reg_neighborhood")
+        .select("neighborhood_name")
+        .eq("local_gov_name", localGovernmentName);
 
       if (error) throw error;
 
-      const neighborhoods = data.map(neighborhood => neighborhood.neighborhood_name);
+      const neighborhoods = data.map(
+        (neighborhood) => neighborhood.neighborhood_name
+      );
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
-        neighborhoods
+        neighborhoods,
       };
       await this.saveSignupData();
 
       return neighborhoods;
     } catch (error) {
-      console.error('Error fetching neighborhoods:', error);
+      console.error("Error fetching neighborhoods:", error);
       return [];
     }
   }
 
-  private async fetchDataFromTable(table: string, column: string, countryName: string): Promise<string[]> {
+  private async fetchDataFromTable(
+    table: string,
+    column: string,
+    countryName: string
+  ): Promise<string[]> {
     console.log(`Fetching data from ${table} for country: ${countryName}`);
     try {
       const { data: tableInfo, error: tableError } = await supabase
         .from(table)
-        .select('*')
+        .select("*")
         .limit(1);
 
       if (tableError) {
         console.error(`Error checking table ${table}:`, tableError);
-        throw new Error(`Table ${table} might not exist or you don't have permission to access it`);
+        throw new Error(
+          `Table ${table} might not exist or you don't have permission to access it`
+        );
       }
 
       const { data, error } = await supabase
         .from(table)
         .select(`${column}, country_name`)
-        .eq('country_name', countryName);
+        .eq("country_name", countryName);
 
       if (error) {
         console.error(`Error fetching data from ${table}:`, error);
@@ -290,7 +311,7 @@ class SignupDataManager {
         return [];
       }
 
-      const result = data.map(item => item[column]);
+      const result = data.map((item) => item[column]);
       console.log(`Processed data from ${table}:`, result);
       return result;
     } catch (error) {
@@ -309,20 +330,20 @@ class SignupDataManager {
 
   private async saveSignupData(): Promise<void> {
     try {
-      await AsyncStorage.setItem('signupData', JSON.stringify(this.signupData));
+      await AsyncStorage.setItem("signupData", JSON.stringify(this.signupData));
     } catch (error) {
-      console.error('Error saving signup data:', error);
+      console.error("Error saving signup data:", error);
     }
   }
 
   async loadSignupData(): Promise<void> {
     try {
-      const savedData = await AsyncStorage.getItem('signupData');
+      const savedData = await AsyncStorage.getItem("signupData");
       if (savedData) {
         this.signupData = JSON.parse(savedData);
       }
     } catch (error) {
-      console.error('Error loading signup data:', error);
+      console.error("Error loading signup data:", error);
     }
   }
 
@@ -333,7 +354,7 @@ class SignupDataManager {
       regionalData: null,
     };
     this.countries = [];
-    await AsyncStorage.removeItem('signupData');
+    await AsyncStorage.removeItem("signupData");
   }
 }
 

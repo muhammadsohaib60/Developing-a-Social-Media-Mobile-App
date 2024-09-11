@@ -1,9 +1,10 @@
 import CustomButton from "@/components/CustomButton";
+import CustomPicker from "@/components/CustomPicker2";
 import Header2 from "@/components/Header2";
 import Progress from "@/components/Progress";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 
 const University = () => {
@@ -11,7 +12,17 @@ const University = () => {
   const [year, setYear] = useState<string>("");
   const [otherUniversity, setOtherUniversity] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
-  const { signUpData, setSignUpData } = useGlobalContext();
+  const { signUpData, setSignUpData, countryData } = useGlobalContext();
+  const [universities, setUniversities] = useState<any>([
+    {
+      label: "Select University",
+      value: "",
+      ...countryData.universities.map((uni: any) => ({
+        label: uni.name,
+        value: uni.name,
+      })),
+    },
+  ]);
 
   const handleSubmit = () => {
     setSignUpData({
@@ -32,11 +43,10 @@ const University = () => {
       />
       <View style={styles.container}>
         <View style={styles.row}>
-          <TextInput
-            placeholder="University/Polyethnic/College"
-            style={{ ...styles.input, width: 250 }}
-            value={university}
-            onChangeText={(text) => setUniversity(text)}
+          <CustomPicker
+            items={universities}
+            selectedValue={university}
+            onValueChange={setUniversity}
           />
           <TextInput
             placeholder="Year"

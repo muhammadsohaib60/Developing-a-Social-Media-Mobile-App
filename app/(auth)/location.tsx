@@ -1,17 +1,205 @@
 import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, TextInput, View, Text } from "react-native";
-import CountryPicker, { Country, CountryCode } from "react-native-country-picker-modal";
+import CountryPicker, {
+  Country,
+  CountryCode,
+} from "react-native-country-picker-modal";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
-import { signupDataManager } from './SignupDataManager';
+import { signupDataManager } from "./SignupDataManager";
+import CustomPicker from "@/components/CustomPicker2";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 // Predefined list of countries
 const COUNTRIES: Country[] = [
-  { cca2: "NG" as CountryCode, name: "Nigeria", callingCode: ["234"], currency: ["NGN"], flag: "flag-ng" },
-  { cca2: "GH" as CountryCode, name: "Ghana", callingCode: ["233"], currency: ["GHS"], flag: "flag-gh" },
+  {
+    cca2: "NG" as CountryCode,
+    name: "Nigeria",
+    callingCode: ["234"],
+    currency: ["NGN"],
+    flag: "flag-ng",
+  },
+  {
+    cca2: "GH" as CountryCode,
+    name: "Ghana",
+    callingCode: ["233"],
+    currency: ["GHS"],
+    flag: "flag-gh",
+  },
 ];
+
+const Location = () => {
+  const [country, setCountry] = useState<Country | null>(null);
+  const [state, setState] = useState<string>("");
+  const [states, setStates] = useState<any>([]);
+  const [localGovernment, setLocalGovernment] = useState<string>("");
+  const [localGovernments, setLocalGovernments] = useState<any>([]);
+  const [neighborhood, setNeighborhood] = useState<string>("");
+  const [neighborhoods, setNeighborhoods] = useState<any>([]);
+  const [otherNeighborhood, setOtherNeighborhood] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const { setSignUpData } = useGlobalContext();
+
+  // Fetch states for the selected country
+  const fetchStates = async (countryName: string) => {
+    try {
+      const fetchedStates = await signupDataManager.fetchStates(countryName);
+      const statesArr = [
+        { label: "Select State", value: "" },
+        ...fetchedStates.map((state) => ({ label: state, value: state })),
+      ];
+      setStates(statesArr);
+    } catch (err) {
+      setError("Failed to fetch states. Please try again.");
+    }
+  };
+
+  // Fetch local governments based on the selected state
+  const fetchLocalGovernments = async (stateName: string) => {
+    try {
+      const fetchedLocalGovernments =
+        await signupDataManager.fetchLocalGovernments(stateName);
+      const localGovArr = [
+        { label: "Select Local Government", value: "" },
+        ...fetchedLocalGovernments.map((lg) => ({ label: lg, value: lg })),
+      ];
+      setLocalGovernments(localGovArr);
+    } catch (err) {
+      setError("Failed to fetch local governments. Please try again.");
+    }
+  };
+
+  // Fetch neighborhoods based on the selected local government
+  const fetchNeighborhoods = async (localGovernmentName: string) => {
+    try {
+      const fetchedNeighborhoods = await signupDataManager.fetchNeighborhoods(
+        localGovernmentName
+      );
+      const neighborhoodArr = [
+        { label: "Select Neighborhood", value: "" },
+        ...fetchedNeighborhoods.map((neighborhood) => ({
+          label: neighborhood,
+          value: neighborhood,
+        })),
+      ];
+      setNeighborhoods(neighborhoodArr);
+    } catch (err) {
+      setError("Failed to fetch neighborhoods. Please try again.");
+    }
+  };
+
+  const handleCountrySelect = async (selectedCountry: Country) => {
+    setCountry(selectedCountry.name);
+    setState(""); // Reset state when country changes
+    setStates([]); // Clear previous states
+    setLocalGovernments([]); // Clear previous local governments
+    setNeighborhoods([]); // Clear previous neighborhoods
+    try {
+      await fetchStates(selectedCountry.name);
+    } catch (err) {
+      setError("Error fetching location data.");
+    }
+  };
+
+  const handleStateSelect = async (selectedState: string) => {
+    setState(selectedState);
+    setLocalGovernments([]); // Clear previous local governments
+    setNeighborhoods([]); // Clear previous neighborhoods
+    try {
+      await fetchLocalGovernments(selectedState);
+    } catch (err) {
+      setError("Error fetching local governments.");
+    }
+  };
+
+  const handleLocalGovernmentSelect = async (
+    selectedLocalGovernment: string
+  ) => {
+    setLocalGovernment(selectedLocalGovernment);
+    setNeighborhoods([]); // Clear previous neighborhoods
+    try {
+      await fetchNeighborhoods(selectedLocalGovernment);
+    } catch (err) {
+      setError("Error fetching neighborhoods.");
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log({
+      country,
+      state,
+      localGovernment,
+      neighborhood: neighborhood || otherNeighborhood,
+    });
+    setSignUpData({
+      country,
+      state,
+      localGovernment,
+      neighborhood: neighborhood || otherNeighborhood,
+    });
+    router.push("/school");
+
+    // if (country && state && localGovernment && neighborhood) {
+    //   router.push("/school");
+    // } else {
+    //   setError("Please select all location fields before proceeding.");
+    // }
+  };
+
+  return (
+    <SafeAreaView style={styles.screen}>
+      <Header2
+        heading1="Choose Your Tribe"
+        heading2="Enter your location and start connecting with people around you"
+      />
+      <View style={styles.container}>
+        <View style={styles.row}>
+          <View style={styles.inputContainer}>
+            <CountryPicker
+              withFilter
+              withFlag
+              withCountryNameButton
+              countryCode={country?.cca2}
+              onSelect={handleCountrySelect}
+              containerButtonStyle={styles.pickerButton}
+              countryCodes={COUNTRIES.map((c) => c.cca2)}
+            />
+          </View>
+          <CustomPicker
+            items={states}
+            selectedValue={state}
+            onValueChange={handleStateSelect}
+          />
+        </View>
+        <View style={styles.row}>
+          <CustomPicker
+            items={localGovernments}
+            selectedValue={localGovernment}
+            onValueChange={handleLocalGovernmentSelect}
+          />
+          <CustomPicker
+            items={neighborhoods}
+            selectedValue={neighborhood}
+            onValueChange={setNeighborhood}
+          />
+        </View>
+        <TextInput
+          placeholder="Enter Neighborhood if not listed"
+          style={styles.input2}
+          value={otherNeighborhood}
+          onChangeText={setOtherNeighborhood}
+        />
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        <CustomButton size={18} text="Next" handlePress={handleSubmit} />
+      </View>
+      <Progress activeCircles={2} />
+    </SafeAreaView>
+  );
+};
+
+export default Location;
 
 const styles = StyleSheet.create({
   screen: {
@@ -23,14 +211,12 @@ const styles = StyleSheet.create({
   },
   container: {
     width: "100%",
-    display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
   row: {
     width: "100%",
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -47,16 +233,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 50,
     alignItems: "center",
-    color: "#969696",
-    fontFamily: "ReemRegular",
-  },
-  input: {
-    backgroundColor: "white",
-    textAlign: "center",
-    width: 180,
-    padding: 10,
-    paddingHorizontal: 20,
-    borderRadius: 50,
     color: "#969696",
     fontFamily: "ReemRegular",
   },
@@ -78,112 +254,3 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
-
-const Location = () => {
-  const [country, setCountry] = useState<Country | null>(null);
-  const [state, setState] = useState<string>("");
-  const [states, setStates] = useState<string[]>([]);
-  const [localGovernment, setLocalGovernment] = useState<string>("");
-  const [neighborhood, setNeighborhood] = useState<string>("");
-  const [otherNeighborhood, setOtherNeighborhood] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-  
-  //fetched states, you will fetch all other similar
-  const fetchStates = async (countryName: string) => {
-    try {
-      const fetchedStates = await signupDataManager.fetchStates(countryName);
-      setStates(fetchedStates);
-      console.log("Fetched states:", fetchedStates);
-    } catch (err) {
-      console.error("Error fetching states:", err);
-      setError("Failed to fetch states. Please try again.");
-    }
-  };
-
-  const handleCountrySelect = async (selectedCountry: Country) => {
-    console.log("Selected country:", selectedCountry);
-    setCountry(selectedCountry);
-    setState(""); // Reset state when country changes
-    setStates([]); // Clear previous states
-
-    try {
-      await signupDataManager.setLocationData({
-        country: selectedCountry,
-        state: "",
-        localGovernment,
-        neighborhood: neighborhood || otherNeighborhood,
-      });
-      console.log("Location data saved:", await signupDataManager.getLocationData());
-      
-      // Fetch states for the selected country
-      await fetchStates(selectedCountry.name);
-    } catch (err) {
-      console.error("Error saving location data:", err);
-      setError("Failed to save location data. Please try again.");
-    }
-  };
-
-  const handleSubmit = () => {
-    if (country && state) {
-      router.push("/school");
-    } else {
-      setError("Please select a country and state before proceeding.");
-    }
-  };
-  return (
-    <SafeAreaView style={styles.screen}>
-      <Header2
-        heading1="Choose Your Tribe"
-        heading2="Enter your location and start connecting with people around you"
-      />
-      <View style={styles.container}>
-        <View style={styles.row}>
-          <View style={styles.inputContainer}>
-            <CountryPicker
-              withFilter
-              withFlag
-              withCountryNameButton
-              countryCode={country?.cca2}
-              onSelect={handleCountrySelect}
-              containerButtonStyle={styles.pickerButton}
-              countryCodes={COUNTRIES.map(c => c.cca2)}
-              onOpen={() => console.log("CountryPicker opened")}
-              onClose={() => console.log("CountryPicker closed")}
-            />
-          </View>
-          <TextInput
-            placeholder="State"
-            style={styles.input}
-            value={state}
-            onChangeText={(text) => setState(text)}
-          />
-        </View>
-        <View style={styles.row}>
-          <TextInput
-            placeholder="Local Government"
-            style={styles.input}
-            value={localGovernment}
-            onChangeText={(text) => setLocalGovernment(text)}
-          />
-          <TextInput
-            placeholder="Neighbourhood"
-            style={styles.input}
-            value={neighborhood}
-            onChangeText={(text) => setNeighborhood(text)}
-          />
-        </View>
-        <TextInput
-          placeholder="Enter Neighbourhood if not listed"
-          style={styles.input2}
-          value={otherNeighborhood}
-          onChangeText={(text) => setOtherNeighborhood(text)}
-        />
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        <CustomButton size={18} text="Next" handlePress={handleSubmit} />
-      </View>
-      <Progress activeCircles={2} />
-    </SafeAreaView>
-  );
-};
-
-export default Location;
