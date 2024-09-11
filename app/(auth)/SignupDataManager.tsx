@@ -199,75 +199,76 @@ class SignupDataManager {
     }
   }
 
-  async fetchStates(countryName: string): Promise<string[]> {
+  async fetchStates(countryName: string): Promise<{ state_name: string; state_id: string }[]> {
     console.log(`Fetching states for country: ${countryName}`);
     try {
       const { data, error } = await supabase
         .from("reg_state")
-        .select("state_name")
+        .select("state_name, state_id")
         .eq("country_name", countryName);
-
+  
       if (error) throw error;
-
-      const states = data.map((state) => state.state_name);
+  
+      const states = data.map((state) => ({
+        state_name: state.state_name,
+        state_id: state.state_id
+      }));
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
         states,
       };
       await this.saveSignupData();
-
+  
       return states;
     } catch (error) {
       console.error("Error fetching states:", error);
       return [];
     }
   }
-
-  async fetchLocalGovernments(stateName: string): Promise<string[]> {
-    console.log(`Fetching local governments for state: ${stateName}`);
+  
+  async fetchLocalGovernments(stateId: string): Promise<any[]> {
+    console.log(`Fetching local governments for state ID: ${stateId}`);
     try {
       const { data, error } = await supabase
         .from("reg_local_government")
-        .select("local_gov_name")
-        .eq("state_name", stateName);
-
+        .select("*")
+        .eq("state_id", stateId);
+  
       if (error) throw error;
-
-      const localGovernments = data.map((lg) => lg.local_gov_name);
+  
+      const localGovernments = data.map((lg) => ({...lg}));
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
         localGovernments,
       };
       await this.saveSignupData();
-
+  
       return localGovernments;
     } catch (error) {
       console.error("Error fetching local governments:", error);
       return [];
     }
   }
-
-  async fetchNeighborhoods(localGovernmentName: string): Promise<string[]> {
+  
+  async fetchNeighborhoods(localGovId: string): Promise<any[]> {
     console.log(
-      `Fetching neighborhoods for local government: ${localGovernmentName}`
+      `Fetching neighborhoods for local government ID: ${localGovId}`
     );
     try {
       const { data, error } = await supabase
         .from("reg_neighborhood")
-        .select("neighborhood_name")
-        .eq("local_gov_name", localGovernmentName);
-
+        .select("*")
+        .eq("local_gov_id", localGovId);
+  
       if (error) throw error;
-
-      const neighborhoods = data.map(
-        (neighborhood) => neighborhood.neighborhood_name
-      );
+  
+      const neighborhoods = data.map((neighborhood) => ({...neighborhood}));
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
         neighborhoods,
       };
       await this.saveSignupData();
-
+  
       return neighborhoods;
     } catch (error) {
       console.error("Error fetching neighborhoods:", error);
