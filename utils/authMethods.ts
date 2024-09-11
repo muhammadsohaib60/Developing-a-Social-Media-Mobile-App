@@ -1,22 +1,16 @@
 import { signUpProps } from "@/constants/types";
-import { supabase } from '../supabaseClient';  // Adjust this path as needed
-import * as FileSystem from 'expo-file-system';
-import { decode } from 'base-64';
-
-
+import { supabase } from "../supabaseClient"; // Adjust this path as needed
+import * as FileSystem from "expo-file-system";
+import { decode } from "base-64";
 
 export const signup = async (data: signUpProps) => {
-  console.log('Signup data:', data);
-  
+  console.log("Signup data:", data);
+
   try {
-    const currentTimestamp = new Date().toISOString();  // Get the current timestamp in ISO format
-
-    
-
-
+    const currentTimestamp = new Date().toISOString(); // Get the current timestamp in ISO format
 
     const { data: newUser, error } = await supabase
-      .from('user_details')
+      .from("user_details")
       .insert([
         {
           email: data.email,
@@ -36,40 +30,45 @@ export const signup = async (data: signUpProps) => {
           uni_grad_year: parseInt(data.universityYear),
           uni_department: data.department,
           religion: data.religion,
-          muslim_sect: data.religion === 'Muslim' ? data.religionSpecific : null,
-          church: data.religion === 'Christian' ? data.religionSpecific : null,
+          muslim_sect:
+            data.religion === "Muslim" ? data.religionSpecific : null,
+          church: data.religion === "Christian" ? data.religionSpecific : null,
           political_party: data.politicalParty,
           sports_club: data.sportsClub,
           ethnic_tribe: data.ethnicTribe,
-          profile_pictures: [] , // Empty array initially
-          created_at: currentTimestamp
-        }
+          profile_pictures: [], // Empty array initially
+          created_at: currentTimestamp,
+        },
       ])
-      .select()  // This will return the inserted row, including the auto-incremented user_id
+      .select() // This will return the inserted row, including the auto-incremented user_id
       .single(); // We expect a single row to be returned
 
     if (error) throw error;
 
     if (!newUser || !newUser.user_id) {
-      throw new Error('User creation failed or user ID is missing');
+      throw new Error("User creation failed or user ID is missing");
     }
 
-   // console.log('User signed up successfully:', newUser);
+    // console.log('User signed up successfully:', newUser);
     return newUser;
   } catch (error) {
-    console.error('Error in signup function:', error);
+    console.error("Error in signup function:", error);
     throw error;
   }
 };
 
-async function uploadImageToBucket(uri: string, username: string, index: number): Promise<string> {
+async function uploadImageToBucket(
+  uri: string,
+  username: string,
+  index: number
+): Promise<string> {
   const MAX_RETRIES = 3;
   let retries = 0;
 
   while (retries < MAX_RETRIES) {
     try {
       //console.log(`Attempting to upload image (attempt ${retries + 1}): ${uri}`);
-      
+
       // Check if file exists and is readable
       const fileInfo = await FileSystem.getInfoAsync(uri);
       if (!fileInfo.exists) {
@@ -77,44 +76,50 @@ async function uploadImageToBucket(uri: string, username: string, index: number)
       }
 
       // Read file as base64
-      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-      
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
       const fileName = `${username}_${index + 1}.jpg`;
       const filePath = `images_user_signup/${fileName}`;
 
       //console.log(`Uploading to Supabase: ${filePath}`);
       const { data, error } = await supabase.storage
-        .from('images_user_signup')
+        .from("images_user_signup")
         .upload(filePath, base64, {
-          contentType: 'image/jpeg',
-          upsert: true
+          contentType: "image/jpeg",
+          upsert: true,
         });
 
       if (error) throw error;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('images_user_signup')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("images_user_signup").getPublicUrl(filePath);
 
       //console.log(`Upload successful, public URL: ${publicUrl}`);
       return publicUrl;
     } catch (error) {
-     // console.error(`Error in uploadImageToBucket (attempt ${retries + 1}):`, error);
+      // console.error(`Error in uploadImageToBucket (attempt ${retries + 1}):`, error);
       retries++;
       if (retries >= MAX_RETRIES) {
         throw error;
       }
       // Wait for a short time before retrying
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
-  throw new Error('Max retries reached for image upload');
+  throw new Error("Max retries reached for image upload");
 }
 
-export const uploadImagesAndUpdateUser = async (userId: number, images: string[], username: string) => {
+export const uploadImagesAndUpdateUser = async (
+  userId: number,
+  images: string[],
+  username: string
+) => {
   //console.log('Received userId:', userId);
   //console.log('Received images:', images);
- // console.log('Received username:', username);
+  // console.log('Received username:', username);
 
   try {
     const imageUploadResults = await Promise.allSettled(
@@ -122,22 +127,28 @@ export const uploadImagesAndUpdateUser = async (userId: number, images: string[]
     );
 
     const successfulUploads = imageUploadResults
-      .filter((result): result is PromiseFulfilledResult<string> => result.status === 'fulfilled')
-      .map(result => result.value);
+      .filter(
+        (result): result is PromiseFulfilledResult<string> =>
+          result.status === "fulfilled"
+      )
+      .map((result) => result.value);
 
     const failedUploads = imageUploadResults
-      .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
-      .map(result => result.reason);
+      .filter(
+        (result): result is PromiseRejectedResult =>
+          result.status === "rejected"
+      )
+      .map((result) => result.reason);
 
     if (failedUploads.length > 0) {
-      console.error('Some image uploads failed:', failedUploads);
+      console.error("Some image uploads failed:", failedUploads);
     }
 
     if (successfulUploads.length > 0) {
       const { data, error } = await supabase
-        .from('user_details')
+        .from("user_details")
         .update({ profile_pictures: successfulUploads })
-        .eq('user_id', userId)
+        .eq("user_id", userId)
         .select();
 
       if (error) {
@@ -148,10 +159,10 @@ export const uploadImagesAndUpdateUser = async (userId: number, images: string[]
       //console.log('User updated with image URLs:', data);
       return { data, failedUploads: failedUploads.length };
     } else {
-      throw new Error('All image uploads failed');
+      throw new Error("All image uploads failed");
     }
   } catch (error) {
-    console.error('Error in uploadImagesAndUpdateUser:', error);
+    console.error("Error in uploadImagesAndUpdateUser:", error);
     throw error;
   }
 };
@@ -159,22 +170,22 @@ export const uploadImagesAndUpdateUser = async (userId: number, images: string[]
 export const signin = async (emailOrPhone: string, password: string) => {
   try {
     const { data: user, error } = await supabase
-      .from('user_details')
-      .select('*')
+      .from("user_details")
+      .select("*")
       .or(`email.eq.${emailOrPhone},phone_number.eq.${emailOrPhone}`)
-      .eq('password', password)
+      .eq("password", password)
       .single();
 
     if (error) throw error;
 
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid credentials");
     }
 
     //console.log('User signed in successfully:', user);
     return user;
   } catch (error) {
-    console.error('Error signing in:', (error as Error).message);
+    console.error("Error signing in:", (error as Error).message);
     throw error;
   }
 };

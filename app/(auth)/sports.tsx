@@ -5,11 +5,25 @@ import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import CustomPicker from "@/components/CustomPicker";
 
 const Sports = () => {
   const { signUpData, setSignUpData } = useGlobalContext();
   const [sportsClub, setSportsClub] = useState<string>("");
   const [otherSportsClub, setOtherSportsClub] = useState<string>("");
+  const { countryData } = useGlobalContext();
+  const [clubs, setClubs] = useState<any>([
+    {
+      label: "Select Sports Club",
+      value: "",
+    },
+    ...countryData.sportsClubs
+      .map((club: any) => ({
+        label: club,
+        value: club,
+      }))
+      .sort((a: any, b: any) => a.label.localeCompare(b.label)),
+  ]);
 
   const handleSubmit = () => {
     setSignUpData({
@@ -35,11 +49,10 @@ const Sports = () => {
           justifyContent: "center",
         }}
       >
-        <TextInput
-          placeholder="Choose Your Sports Club"
-          style={styles.input}
-          value={sportsClub}
-          onChangeText={(text) => setSportsClub(text)}
+        <CustomPicker
+          items={clubs}
+          selectedValue={sportsClub}
+          onValueChange={setSportsClub}
         />
         <TextInput
           placeholder="Enter Sports Club if not listed"

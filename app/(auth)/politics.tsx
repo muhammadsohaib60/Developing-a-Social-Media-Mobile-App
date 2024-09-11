@@ -5,12 +5,26 @@ import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import CustomPicker from "@/components/CustomPicker";
 
 const Politics = () => {
   const { signUpData, setSignUpData } = useGlobalContext();
 
   const [party, setParty] = useState<string>("");
   const [otherParty, setOtherParty] = useState<string>("");
+  const { countryData } = useGlobalContext();
+  const [parties, setParties] = useState<any>([
+    {
+      label: "Select Political Party",
+      value: "",
+    },
+    ...countryData.politicalParties
+      .map((party: any) => ({
+        label: party,
+        value: party,
+      }))
+      .sort((a: any, b: any) => a.label.localeCompare(b.label)),
+  ]);
 
   const handleSubmit = () => {
     setSignUpData({
@@ -35,11 +49,10 @@ const Politics = () => {
           justifyContent: "center",
         }}
       >
-        <TextInput
-          placeholder="Choose Political Party"
-          style={styles.input}
-          value={party}
-          onChangeText={(text) => setParty(text)}
+        <CustomPicker
+          items={parties}
+          selectedValue={party}
+          onValueChange={setParty}
         />
         <TextInput
           placeholder="Enter Political Party if not listed"

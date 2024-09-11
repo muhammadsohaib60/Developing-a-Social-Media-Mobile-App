@@ -31,7 +31,7 @@ const CustomPicker3 = ({
 const styles = StyleSheet.create({
   pickerContainer: {
     backgroundColor: "white",
-    width: "25%",
+    width: "30%",
     borderRadius: 50,
     marginBottom: 10,
     overflow: "hidden", // Ensures the picker is contained within the rounded borders

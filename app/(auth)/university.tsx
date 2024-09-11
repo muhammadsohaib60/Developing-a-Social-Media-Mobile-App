@@ -1,5 +1,6 @@
 import CustomButton from "@/components/CustomButton";
 import CustomPicker from "@/components/CustomPicker2";
+import CustomPicker3 from "@/components/CustomPicker3";
 import Header2 from "@/components/Header2";
 import Progress from "@/components/Progress";
 import { useGlobalContext } from "@/context/GlobalProvider";
@@ -17,12 +18,15 @@ const University = () => {
     {
       label: "Select University",
       value: "",
-      ...countryData.universities.map((uni: any) => ({
-        label: uni.name,
-        value: uni.name,
-      })),
     },
+    ...countryData.universities
+      .map((uni: any) => ({
+        label: uni,
+        value: uni,
+      }))
+      .sort((a: any, b: any) => a.label.localeCompare(b.label)),
   ]);
+  console.log("Universities:", universities);
 
   const handleSubmit = () => {
     setSignUpData({
@@ -48,12 +52,19 @@ const University = () => {
             selectedValue={university}
             onValueChange={setUniversity}
           />
-          <TextInput
-            placeholder="Year"
-            style={{ ...styles.input, width: 100 }}
-            value={year}
-            onChangeText={(text) => setYear(text)}
-            keyboardType="numeric"
+          <CustomPicker3
+            items={[
+              {
+                label: "Year",
+                value: "year",
+              },
+              ...Array.from({ length: 75 }, (_, index) => ({
+                label: (2024 - index).toString(),
+                value: (2024 - index).toString(),
+              })),
+            ]}
+            selectedValue={year}
+            onValueChange={setYear}
           />
         </View>
         <TextInput

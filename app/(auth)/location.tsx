@@ -40,7 +40,7 @@ const Location = () => {
   const [neighborhoods, setNeighborhoods] = useState<any>([]);
   const [otherNeighborhood, setOtherNeighborhood] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const { setSignUpData } = useGlobalContext();
+  const { signUpData, setSignUpData } = useGlobalContext();
 
   // Fetch states for the selected country
   const fetchStates = async (countryName: string) => {
@@ -98,7 +98,7 @@ const Location = () => {
   };
 
   const handleCountrySelect = async (selectedCountry: Country) => {
-    setCountry(selectedCountry);
+    setCountry(selectedCountry.name);
     try {
       await signupDataManager.setLocationData({
         country: selectedCountry,
@@ -152,6 +152,7 @@ const Location = () => {
       neighborhood: neighborhood || otherNeighborhood,
     });
     setSignUpData({
+      ...signUpData,
       country,
       state,
       localGovernment,

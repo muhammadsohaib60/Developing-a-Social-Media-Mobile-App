@@ -5,11 +5,25 @@ import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import CustomPicker from "@/components/CustomPicker";
 
 const Christian = () => {
   const { signUpData, setSignUpData } = useGlobalContext();
   const [church, setChurch] = useState<string>("");
   const [otherChurch, setOtherChurch] = useState<string>("");
+  const { countryData } = useGlobalContext();
+  const [churches, setChurches] = useState<any>([
+    {
+      label: "Select Church",
+      value: "",
+    },
+    ...countryData.churches
+      .map((church: any) => ({
+        label: church,
+        value: church,
+      }))
+      .sort((a: any, b: any) => a.label.localeCompare(b.label)),
+  ]);
 
   const handleSubmit = () => {
     setSignUpData({
@@ -36,11 +50,10 @@ const Christian = () => {
           justifyContent: "center",
         }}
       >
-        <TextInput
-          placeholder="Choose a Church"
-          style={styles.input}
-          value={church}
-          onChangeText={(text) => setChurch(text)}
+        <CustomPicker
+          items={churches}
+          selectedValue={church}
+          onValueChange={setChurch}
         />
         <TextInput
           placeholder="Enter Church if not listed"

@@ -51,9 +51,21 @@ const School = () => {
               value: school,
             };
           });
+
+          //sort schools alphabetically
+          schoolsArr.sort((a: any, b: any) => {
+            if (a.label < b.label) {
+              return -1;
+            }
+            if (a.label > b.label) {
+              return 1;
+            }
+            return 0;
+          });
+
           setSchools([...schools, ...schoolsArr]);
 
-          console.log("Country-specific data:", specificData);
+          console.log("Country-specific data:", specificData.universities);
         } else {
           console.log("Country data is:");
           console.log(locationData);
@@ -90,10 +102,16 @@ const School = () => {
             onValueChange={setSchool}
           />
           <CustomPicker3
-            items={Array.from({ length: 75 }, (_, index) => ({
-              label: (2024 - index).toString(),
-              value: (2024 - index).toString(),
-            }))}
+            items={[
+              {
+                label: "Year",
+                value: "year",
+              },
+              ...Array.from({ length: 75 }, (_, index) => ({
+                label: (2024 - index).toString(),
+                value: (2024 - index).toString(),
+              })),
+            ]}
             selectedValue={year}
             onValueChange={setYear}
           />
