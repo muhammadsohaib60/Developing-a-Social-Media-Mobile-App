@@ -25,6 +25,7 @@ interface CountrySpecificData {
   politicalParties: string[];
   sportsClubs: string[];
   universities: string[];
+  schools: string[];
 }
 
 interface RegionalData {
@@ -121,12 +122,14 @@ class SignupDataManager {
         politicalParties,
         sportsClubs,
         universities,
+        schools,
       ] = await Promise.all([
         this.fetchDataFromTable("reg_churches", "church_name", countryName),
         this.fetchDataFromTable("ethnic_groups", "ethnic_name", countryName),
         this.fetchDataFromTable("political_parties", "party_name", countryName),
         this.fetchDataFromTable("reg_sports_club", "club_name", countryName),
         this.fetchDataFromTable("reg_universities", "uni_name", countryName),
+        this.fetchDataFromTable("reg_schools", "school_name", countryName),
       ]);
 
       const countrySpecificData: CountrySpecificData = {
@@ -135,6 +138,7 @@ class SignupDataManager {
         politicalParties,
         sportsClubs,
         universities,
+        schools,
       };
 
       console.log("Fetched country-specific data:", countrySpecificData);

@@ -6,6 +6,7 @@ import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import CustomPicker from "@/components/CustomPicker2";
 
 interface Country {
   callingCode: string[];
@@ -24,6 +25,9 @@ const School = () => {
   const { signUpData, setSignUpData, setCountryData } = useGlobalContext();
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [countrySpecificData, setCountrySpecificData] = useState<any>(null);
+  const [schools, setSchools] = useState<any>([
+    { label: "Select School", value: "" },
+  ]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -39,6 +43,14 @@ const School = () => {
           );
           setCountrySpecificData(specificData);
           setCountryData(specificData);
+
+          const schools = specificData.schools.map((school: any) => {
+            return {
+              label: school,
+              value: school,
+            };
+          });
+          setSchools(schools);
 
           console.log("Country-specific data:", specificData);
         } else {
@@ -69,11 +81,10 @@ const School = () => {
       />
       <View style={styles.container}>
         <View style={styles.row}>
-          <TextInput
-            placeholder="Enter Secondary School"
-            style={{ ...styles.input, width: 200 }}
-            value={school}
-            onChangeText={(text) => setSchool(text)}
+          <CustomPicker
+            items={schools}
+            selectedValue={school}
+            onValueChange={setSchool}
           />
           <TextInput
             placeholder="Year"
