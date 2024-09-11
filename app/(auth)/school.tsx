@@ -7,6 +7,7 @@ import Header2 from "@/components/Header2";
 import { router } from "expo-router";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import CustomPicker from "@/components/CustomPicker2";
+import CustomPicker3 from "@/components/CustomPicker3";
 
 interface Country {
   callingCode: string[];
@@ -44,13 +45,13 @@ const School = () => {
           setCountrySpecificData(specificData);
           setCountryData(specificData);
 
-          const schools = specificData.schools.map((school: any) => {
+          const schoolsArr = specificData.schools.map((school: any) => {
             return {
               label: school,
               value: school,
             };
           });
-          setSchools(schools);
+          setSchools([...schools, ...schoolsArr]);
 
           console.log("Country-specific data:", specificData);
         } else {
@@ -86,12 +87,13 @@ const School = () => {
             selectedValue={school}
             onValueChange={setSchool}
           />
-          <TextInput
-            placeholder="Year"
-            style={{ ...styles.input, width: 100 }}
-            value={year}
-            onChangeText={(text) => setYear(text)}
-            keyboardType="numeric"
+          <CustomPicker3
+            items={Array.from({ length: 75 }, (_, index) => ({
+              label: (2024 - index).toString(),
+              value: (2024 - index).toString(),
+            }))}
+            selectedValue={year}
+            onValueChange={setYear}
           />
         </View>
         <TextInput

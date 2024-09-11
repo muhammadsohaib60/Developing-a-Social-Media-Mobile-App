@@ -32,7 +32,7 @@ const COUNTRIES: Country[] = [
 
 const Location = () => {
   const [country, setCountry] = useState<Country | null>(null);
-  const [state, setState] = useState<string>("");
+  const [state, setState] = useState<string>();
   const [states, setStates] = useState<any>([]);
   const [localGovernment, setLocalGovernment] = useState<string>("");
   const [localGovernments, setLocalGovernments] = useState<any>([]);
@@ -48,7 +48,10 @@ const Location = () => {
       const fetchedStates = await signupDataManager.fetchStates(countryName);
       const statesArr = [
         { label: "Select State", value: "" },
-        ...fetchedStates.map((state) => ({ label: state, value: state })),
+        ...fetchedStates.map((state) => ({
+          label: state.state_name,
+          value: state.state_id,
+        })),
       ];
       setStates(statesArr);
     } catch (err) {
@@ -61,9 +64,13 @@ const Location = () => {
     try {
       const fetchedLocalGovernments =
         await signupDataManager.fetchLocalGovernments(stateName);
+      console.log(fetchedLocalGovernments);
       const localGovArr = [
         { label: "Select Local Government", value: "" },
-        ...fetchedLocalGovernments.map((lg) => ({ label: lg, value: lg })),
+        ...fetchedLocalGovernments.map((lg) => ({
+          label: lg.local_gov_name,
+          value: lg.local_gov_id,
+        })),
       ];
       setLocalGovernments(localGovArr);
     } catch (err) {
@@ -80,8 +87,8 @@ const Location = () => {
       const neighborhoodArr = [
         { label: "Select Neighborhood", value: "" },
         ...fetchedNeighborhoods.map((neighborhood) => ({
-          label: neighborhood,
-          value: neighborhood,
+          label: neighborhood.neighborhood_name,
+          value: neighborhood.neighborhood_name,
         })),
       ];
       setNeighborhoods(neighborhoodArr);
@@ -107,8 +114,9 @@ const Location = () => {
     setState(selectedState);
     setLocalGovernments([]); // Clear previous local governments
     setNeighborhoods([]); // Clear previous neighborhoods
+
     try {
-      await fetchLocalGovernments(selectedState);
+      fetchLocalGovernments(selectedState);
     } catch (err) {
       setError("Error fetching local governments.");
     }

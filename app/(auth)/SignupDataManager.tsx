@@ -203,33 +203,35 @@ class SignupDataManager {
     }
   }
 
-  async fetchStates(countryName: string): Promise<{ state_name: string; state_id: string }[]> {
+  async fetchStates(
+    countryName: string
+  ): Promise<{ state_name: string; state_id: string }[]> {
     console.log(`Fetching states for country: ${countryName}`);
     try {
       const { data, error } = await supabase
         .from("reg_state")
         .select("state_name, state_id")
         .eq("country_name", countryName);
-  
+
       if (error) throw error;
-  
+
       const states = data.map((state) => ({
         state_name: state.state_name,
-        state_id: state.state_id
+        state_id: state.state_id,
       }));
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
         states,
       };
       await this.saveSignupData();
-  
+
       return states;
     } catch (error) {
       console.error("Error fetching states:", error);
       return [];
     }
   }
-  
+
   async fetchLocalGovernments(stateId: string): Promise<any[]> {
     console.log(`Fetching local governments for state ID: ${stateId}`);
     try {
@@ -237,23 +239,23 @@ class SignupDataManager {
         .from("reg_local_government")
         .select("*")
         .eq("state_id", stateId);
-  
+
       if (error) throw error;
-  
-      const localGovernments = data.map((lg) => ({...lg}));
+
+      const localGovernments = data.map((lg) => ({ ...lg }));
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
         localGovernments,
       };
       await this.saveSignupData();
-  
+
       return localGovernments;
     } catch (error) {
       console.error("Error fetching local governments:", error);
       return [];
     }
   }
-  
+
   async fetchNeighborhoods(localGovId: string): Promise<any[]> {
     console.log(
       `Fetching neighborhoods for local government ID: ${localGovId}`
@@ -263,16 +265,16 @@ class SignupDataManager {
         .from("reg_neighborhood")
         .select("*")
         .eq("local_gov_id", localGovId);
-  
+
       if (error) throw error;
-  
-      const neighborhoods = data.map((neighborhood) => ({...neighborhood}));
+
+      const neighborhoods = data.map((neighborhood) => ({ ...neighborhood }));
       this.signupData.regionalData = {
         ...this.signupData.regionalData,
         neighborhoods,
       };
       await this.saveSignupData();
-  
+
       return neighborhoods;
     } catch (error) {
       console.error("Error fetching neighborhoods:", error);

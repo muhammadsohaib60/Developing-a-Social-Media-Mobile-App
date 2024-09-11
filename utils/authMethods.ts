@@ -11,6 +11,10 @@ export const signup = async (data: signUpProps) => {
   try {
     const currentTimestamp = new Date().toISOString();  // Get the current timestamp in ISO format
 
+    
+
+
+
     const { data: newUser, error } = await supabase
       .from('user_details')
       .insert([
