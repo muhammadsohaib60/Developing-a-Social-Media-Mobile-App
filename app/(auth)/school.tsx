@@ -42,6 +42,8 @@ const School = () => {
 
           console.log("Country-specific data:", specificData);
         } else {
+          console.log("Country data is:");
+          console.log(locationData);
           console.log("No country data found");
         }
       } catch (error) {

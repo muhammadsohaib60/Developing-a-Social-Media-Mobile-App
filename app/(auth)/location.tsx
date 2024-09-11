@@ -91,15 +91,25 @@ const Location = () => {
   };
 
   const handleCountrySelect = async (selectedCountry: Country) => {
-    setCountry(selectedCountry.name);
-    setState(""); // Reset state when country changes
-    setStates([]); // Clear previous states
-    setLocalGovernments([]); // Clear previous local governments
-    setNeighborhoods([]); // Clear previous neighborhoods
+    setCountry(selectedCountry);
     try {
+      await signupDataManager.setLocationData({
+        country: selectedCountry,
+        state: "",
+        localGovernment: "",
+        neighborhood: "",
+      });
+      console.log("Country data saved:", selectedCountry);
+      // Reset other fields when country changes
+      setState("");
+      setLocalGovernment("");
+      setNeighborhood("");
+      setOtherNeighborhood("");
+      // Fetch states for the new country
       await fetchStates(selectedCountry.name);
     } catch (err) {
-      setError("Error fetching location data.");
+      setError("Error saving country data. Please try again.");
+      console.error("Error saving country data:", err);
     }
   };
 
