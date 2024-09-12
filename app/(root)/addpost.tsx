@@ -8,7 +8,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { Video } from "expo-av";
+import { ResizeMode, Video } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import GradientView from "@/components/GradientView";
 import { Ionicons } from "@expo/vector-icons";
@@ -166,7 +166,7 @@ const styles = {
   media: {
     width: 200,
     height: 400,
-    resizeMode: "contain",
+    resizeMode: ResizeMode.COVER,
   },
   button: {
     flexDirection: "row",

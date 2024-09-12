@@ -17,6 +17,7 @@ import { comment, like, share } from "@/constants/icons";
 import { user } from "@/constants/images";
 import { router } from "expo-router";
 import { feedApiManager, Post } from "@/app/(root)/FeedApiManager";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
@@ -52,7 +53,14 @@ const PostComponent = ({ post }: { post: Post }) => {
   };
 
   const getReaction = async () => {
-    const data = await feedApiManager.fetchReactionOnPost(post.posts_id, "41");
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+    const data = await feedApiManager.fetchReactionOnPost(
+      post.posts_id,
+      userId
+    );
     setReaction(data.reaction_type);
   };
 
@@ -73,12 +81,20 @@ const PostComponent = ({ post }: { post: Post }) => {
     if (newComment.trim() === "") {
       return;
     }
-    await feedApiManager.postComment(post.posts_id, "41", newComment);
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+    await feedApiManager.postComment(post.posts_id, userId, newComment);
     getComments(post.posts_id);
   };
 
   const handleReaction = async (reaction: any) => {
-    await feedApiManager.reactOnPost(post.posts_id, "41", reaction);
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+    await feedApiManager.reactOnPost(post.posts_id, userId, reaction);
 
     setSelectedReaction(reaction);
     setReactionModalVisible(false);
