@@ -1,12 +1,16 @@
 import { supabase } from "../../supabaseClient";
 import * as FileSystem from "expo-file-system";
 
-interface Post {
-  id: string;
+export interface Post {
+  posts_id: number;
   user_id: string;
-  content_paths: string[];
+  content_path: string[];
   caption: string;
   created_at: string;
+  user_details: {
+    username: string;
+    profile_picture: string;
+  };
 }
 
 interface Reaction {
@@ -17,12 +21,16 @@ interface Reaction {
   created_at: string;
 }
 
-interface Story {
-  id: string;
+export type Story = {
+  story_id: string;
   user_id: string;
   content_path: string;
   created_at: string;
-}
+  user_details: {
+    username: string;
+    profile_picture: string;
+  };
+};
 
 interface PostWithDetails extends Post {
   reactions: Reaction[];
@@ -134,14 +142,136 @@ class FeedApiManager {
     try {
       const { data, error } = await supabase
         .from("posts")
-        .select("id, user_id, content_paths, caption, created_at") // Make sure 'id' is included
+        .select(
+          `
+          posts_id, 
+          user_id, 
+          content_path, 
+          caption, 
+          created_at,
+          user_details(username, profile_pictures)
+        `
+        ) // Fetch profile_pictures without array indexing
         .order("created_at", { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (error) throw error;
-      return data;
+
+      // Transform the data to extract the first profile picture manually
+      const posts: Post[] = data.map((post: any) => ({
+        posts_id: post.posts_id,
+        user_id: post.user_id,
+        content_path: post.content_path,
+        caption: post.caption,
+        created_at: post.created_at,
+        user_details: {
+          username: post.user_details?.username || "",
+          profile_picture: post.user_details?.profile_pictures?.[0] || null, // Extract the first picture or null
+        },
+      }));
+
+      return posts;
     } catch (error) {
       console.error("Error fetching posts:", error);
+      throw error;
+    }
+  }
+
+  async postComment(postId: number, userId: string, content: string) {
+    try {
+      const { data, error } = await supabase.from("comments").insert([
+        {
+          post_id: postId,
+          user_id: userId,
+          content: content,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      throw error;
+    }
+  }
+  async reactOnPost(postId: number, userId: string, reactionType: string) {
+    try {
+      // Check if reaction for this post and user exists
+      const { data: existingReaction, error: existingReactionError } =
+        await supabase
+          .from("reactions")
+          .select("*")
+          .eq("post_id", postId)
+          .eq("user_id", userId)
+          .maybeSingle(); // Use maybeSingle to avoid throwing an error if the record doesn't exist
+
+      if (existingReactionError) throw existingReactionError;
+
+      if (existingReaction) {
+        // Update existing reaction
+        const { data: updatedReaction, error: updateError } = await supabase
+          .from("reactions")
+          .update({ reaction_type: reactionType })
+          .eq("id", existingReaction.id)
+          .single(); // single here because you are updating a specific reaction
+
+        if (updateError) throw updateError;
+
+        return updatedReaction;
+      } else {
+        // Add new reaction
+        const { data: newReaction, error: insertError } = await supabase
+          .from("reactions")
+          .insert([
+            {
+              post_id: postId,
+              user_id: userId,
+              reaction_type: reactionType,
+              created_at: new Date().toISOString(),
+            },
+          ])
+          .single(); // single here because you are inserting a single reaction
+
+        if (insertError) throw insertError;
+
+        return newReaction;
+      }
+    } catch (error) {
+      console.error("Error reacting on post:", error);
+      throw error;
+    }
+  }
+
+  async getCommentsForPost(postId: number) {
+    try {
+      const { data, error } = await supabase
+        .from("comments")
+        .select(
+          `
+          id,
+          user_id,
+          content,
+          user_details(username, profile_pictures)
+          `
+        )
+        .order("created_at", { ascending: false })
+        .eq("post_id", postId);
+
+      const comments = data?.map((comment: any) => ({
+        id: comment.id,
+        user_id: comment.user_id,
+        content: comment.content,
+        user_details: {
+          username: comment.user_details?.username || "",
+          profile_picture: comment.user_details?.profile_pictures?.[0] || null,
+        },
+      }));
+
+      if (error) throw error;
+      return comments;
+    } catch (error) {
+      console.error(`Error fetching comments for post ${postId}:`, error);
       throw error;
     }
   }
@@ -173,7 +303,7 @@ class FeedApiManager {
       const postsWithReactions = await Promise.all(
         posts.map(async (post) => {
           // Here, post.id is available because it's a property of each post fetched by getPosts
-          const reactions = await this.getReactionsForPost(post.id);
+          const reactions = await this.getReactionsForPost(post.posts_id);
           // Return a new object spreading the post properties and adding the reactions
           return { ...post, reactions };
         })
@@ -298,16 +428,38 @@ class FeedApiManager {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
+      // Fetch stories along with the user details (username and profile_pictures)
       const { data, error } = await supabase
         .from("stories")
-        .select("id, user_id, content_path, created_at")
+        .select(
+          `
+          story_id, 
+          user_id, 
+          content_path, 
+          created_at, 
+          user_details(username, profile_pictures)
+        `
+        )
         .gte("created_at", today.toISOString())
         .lt("created_at", tomorrow.toISOString())
         .order("created_at", { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (error) throw error;
-      return data;
+
+      // Map over the data to structure the user details correctly
+      const stories: Story[] = data.map((story: any) => ({
+        story_id: story.story_id,
+        user_id: story.user_id,
+        content_path: story.content_path,
+        created_at: story.created_at,
+        user_details: {
+          username: story.user_details?.username || "",
+          profile_picture: story.user_details?.profile_pictures?.[0] || null,
+        },
+      }));
+
+      return stories;
     } catch (error) {
       console.error("Error fetching today's stories:", error);
       throw error;

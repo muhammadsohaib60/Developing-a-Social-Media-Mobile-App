@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Image,
@@ -7,15 +7,28 @@ import {
   TouchableOpacity,
   Text,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { ResizeMode, Video } from "expo-av";
 import {
   GestureHandlerRootView,
   PanGestureHandler,
 } from "react-native-gesture-handler";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { setStories2 } from "@/constants/date-setter";
+import { feedApiManager } from "./FeedApiManager";
+
+interface StoryComponentProps {
+  story_id: string;
+  user_id: string;
+  content_path: string;
+  created_at: string;
+  user_details: {
+    username: string;
+    profile_picture: string;
+  };
+}
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,6 +41,9 @@ const StoryScreen = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const videoRef = useRef(null);
+
+  const [stories, setStories] = useState<StoryComponentProps[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleNext = () => {
     if (currentIndex < stories.length - 1) {
@@ -48,6 +64,34 @@ const StoryScreen = () => {
   const onSwipeLeft = () => handleNext();
   const onSwipeRight = () => handlePrevious();
 
+  const getStories = async () => {
+    const data = await feedApiManager.getTodayStories();
+    setStories(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getStories();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Do something when the screen is focused
+
+      return () => {
+        getStories();
+      };
+    }, [])
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="purple" />
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Modal transparent={true} animationType="fade">
@@ -62,16 +106,16 @@ const StoryScreen = () => {
             }}
           >
             <View style={styles.content}>
-              {stories[currentIndex].type === "image" ? (
+              {stories[currentIndex].content_path[0] === "3" ? (
                 <Image
-                  source={stories[currentIndex].source}
+                  source={{ uri: stories[currentIndex].content_path }}
                   style={styles.media}
                   resizeMode="contain"
                 />
               ) : (
                 <Video
                   ref={videoRef}
-                  source={stories[currentIndex].source}
+                  source={{ uri: stories[currentIndex].content_path }}
                   style={styles.media}
                   resizeMode={ResizeMode.CONTAIN}
                   shouldPlay
@@ -85,12 +129,14 @@ const StoryScreen = () => {
             <View style={styles.userInfo}>
               <TouchableOpacity onPress={() => router.push("/otherprofile")}>
                 <Image
-                  source={stories[currentIndex].user.profileImage}
+                  source={{
+                    uri: stories[currentIndex].user_details.profile_picture,
+                  }}
                   style={styles.profileImage}
                 />
               </TouchableOpacity>
               <Text style={styles.username}>
-                {stories[currentIndex].user.name}
+                {stories[currentIndex].user_details.username}
               </Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
