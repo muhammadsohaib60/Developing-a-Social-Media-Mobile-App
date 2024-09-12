@@ -2,6 +2,7 @@ import { signUpProps } from "@/constants/types";
 import { supabase } from "../supabaseClient"; // Adjust this path as needed
 import * as FileSystem from "expo-file-system";
 import { decode } from "base-64";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const signup = async (data: signUpProps) => {
   console.log("Signup data:", data);
@@ -181,6 +182,19 @@ export const signin = async (emailOrPhone: string, password: string) => {
     if (!user) {
       throw new Error("Invalid credentials");
     }
+
+    if (!user.user_id) {
+      throw new Error("User ID is missing");
+    }
+
+    // Store user_id in AsyncStorage
+    await AsyncStorage.setItem('userId', user.user_id.toString());
+    console.log("Stored user ID:", user.user_id.toString());
+
+    // Clear all other AsyncStorage items
+    const allKeys = await AsyncStorage.getAllKeys();
+    const keysToRemove = allKeys.filter(key => key !== 'userId');
+    await AsyncStorage.multiRemove(keysToRemove);
 
     //console.log('User signed in successfully:', user);
     return user;

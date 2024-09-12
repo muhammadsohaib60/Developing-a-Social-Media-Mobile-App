@@ -6,14 +6,19 @@ import {
   Image,
   ScrollView,
   Text,
+  Alert,
 } from "react-native";
 import { Video } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import GradientView from "@/components/GradientView";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { feedApiManager } from "./FeedApiManager"; // Ensure this path is correct
 
 const AddStory = () => {
   const [media, setMedia] = useState<any>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string>("");
 
   const pickMedia = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -27,9 +32,47 @@ const AddStory = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // Handle story submission logic here (e.g., upload to server or database)
-    console.log("Story submitted:", media);
+  const handleSubmit = async () => {
+    if (media.length === 0) {
+      Alert.alert("Error", "Please select at least one image or video");
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadStatus("Starting upload...");
+
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+
+      const created_at = new Date().toISOString();
+
+      for (const item of media) {
+        setUploadStatus(`Uploading ${media.indexOf(item) + 1} of ${media.length}...`);
+        const result = await feedApiManager.uploadStoryAndCreateEntry(
+          userId,
+          item,
+          created_at
+        );
+
+        if (!result.story) {
+          throw new Error(result.error || "Failed to add story");
+        }
+      }
+
+      setUploadStatus("All stories added successfully!");
+      Alert.alert("Success", "All stories added successfully!");
+      setMedia([]);
+    } catch (error) {
+      console.error("Error adding stories:", error);
+      setUploadStatus(`Error: ${error.message}`);
+      Alert.alert("Error", `Failed to add stories. ${error.message}`);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -56,11 +99,19 @@ const AddStory = () => {
 
         {/* Submit Button */}
         <TouchableOpacity
-          style={[styles.button, styles.submitButton]}
+          style={[styles.button, styles.submitButton, isUploading && styles.disabledButton]}
           onPress={handleSubmit}
+          disabled={isUploading}
         >
-          <Text style={styles.buttonText}>Pubish Story</Text>
+          <Text style={styles.buttonText}>
+            {isUploading ? "Uploading..." : "Publish Story"}
+          </Text>
         </TouchableOpacity>
+
+        {/* Upload Status */}
+        {uploadStatus !== "" && (
+          <Text style={styles.statusText}>{uploadStatus}</Text>
+        )}
       </View>
     </GradientView>
   );
@@ -105,5 +156,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#228B22",
     marginTop: 20,
     marginBottom: 20,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  statusText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "white",
+    textAlign: "center",
   },
 });

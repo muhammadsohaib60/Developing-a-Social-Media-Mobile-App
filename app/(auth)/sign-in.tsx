@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import Header from "@/components/Header";
 import { signin } from "@/utils/authMethods";
 import { signupDataManager } from "./SignupDataManager"; // Import the SignupDataManager
+import { feedApiManager } from './FeedApiManager';
 
 const SignIn = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
