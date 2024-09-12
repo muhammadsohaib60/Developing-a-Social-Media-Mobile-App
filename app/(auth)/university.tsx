@@ -6,7 +6,7 @@ import Progress from "@/components/Progress";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 
 const University = () => {
   const [university, setUniversity] = useState<string>("");
@@ -29,6 +29,14 @@ const University = () => {
   console.log("Universities:", universities);
 
   const handleSubmit = () => {
+
+    if (!university && !otherUniversity) {
+      return Alert.alert("Validation Error", "Please select a university.");
+    }
+    if (!year) {
+      return Alert.alert("Validation Error", "Please select a year.");
+    }
+
     setSignUpData({
       ...signUpData,
       university: university || otherUniversity,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import GradientView from "@/components/GradientView";
 import HomeSearchBar from "@/components/HomeSearchBar";
@@ -9,6 +9,10 @@ import { setPost } from "@/constants/date-setter";
 const posts = setPost();
 
 const Home = () => {
+  const [postsArr, setPostsArr] = useState<any>([]);
+
+  useEffect(() => {}, []);
+
   return (
     <GradientView>
       <HomeSearchBar />

@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
@@ -11,6 +11,13 @@ const Traditionalist = () => {
   const [tribe, setTribe] = useState<string>("");
 
   const handleSubmit = () => {
+    if (!tribe) {
+      return Alert.alert(
+        "Validation Error",
+        "Please enter the name of your tribe."
+      );
+    }
+
     setSignUpData({
       ...signUpData,
       religion: "Traditionalist",

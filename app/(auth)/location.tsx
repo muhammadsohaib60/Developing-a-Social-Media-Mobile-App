@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { SafeAreaView, StyleSheet, TextInput, View, Alert } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  View,
+  Text,
+  Alert,
+} from "react-native";
 import CountryPicker, {
   Country,
   CountryCode,
@@ -20,8 +27,6 @@ const COUNTRIES: Country[] = [
     callingCode: ["234"],
     currency: ["NGN"],
     flag: "flag-ng",
-    region: "Africa",
-    subregion: "Western Africa",
   },
   {
     cca2: "GH" as CountryCode,
@@ -29,24 +34,19 @@ const COUNTRIES: Country[] = [
     callingCode: ["233"],
     currency: ["GHS"],
     flag: "flag-gh",
-    region: "Africa",
-    subregion: "Western Africa",
   },
 ];
 
 const Location = () => {
   const [country, setCountry] = useState<Country | null>(null);
-  const [state, setState] = useState<string>("");
-  const [states, setStates] = useState<{ label: string; value: string }[]>([]);
+  const [state, setState] = useState<string>();
+  const [states, setStates] = useState<any>([]);
   const [localGovernment, setLocalGovernment] = useState<string>("");
-  const [localGovernments, setLocalGovernments] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [localGovernments, setLocalGovernments] = useState<any>([]);
   const [neighborhood, setNeighborhood] = useState<string>("");
-  const [neighborhoods, setNeighborhoods] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [neighborhoods, setNeighborhoods] = useState<any>([]);
   const [otherNeighborhood, setOtherNeighborhood] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const { signUpData, setSignUpData } = useGlobalContext();
 
   // Fetch states for the selected country
@@ -55,14 +55,14 @@ const Location = () => {
       const fetchedStates = await signupDataManager.fetchStates(countryName);
       const statesArr = [
         { label: "Select State", value: "" },
-        ...fetchedStates.map((state: any) => ({
+        ...fetchedStates.map((state) => ({
           label: state.state_name,
           value: state.state_id,
         })),
       ];
       setStates(statesArr);
     } catch (err) {
-      Alert.alert("Error", "Failed to fetch states. Please try again.");
+      setError("Failed to fetch states. Please try again.");
     }
   };
 
@@ -71,19 +71,17 @@ const Location = () => {
     try {
       const fetchedLocalGovernments =
         await signupDataManager.fetchLocalGovernments(stateName);
+      console.log(fetchedLocalGovernments);
       const localGovArr = [
         { label: "Select Local Government", value: "" },
-        ...fetchedLocalGovernments.map((lg: any) => ({
+        ...fetchedLocalGovernments.map((lg) => ({
           label: lg.local_gov_name,
           value: lg.local_gov_id,
         })),
       ];
       setLocalGovernments(localGovArr);
     } catch (err) {
-      Alert.alert(
-        "Error",
-        "Failed to fetch local governments. Please try again."
-      );
+      setError("Failed to fetch local governments. Please try again.");
     }
   };
 
@@ -95,52 +93,49 @@ const Location = () => {
       );
       const neighborhoodArr = [
         { label: "Select Neighborhood", value: "" },
-        ...fetchedNeighborhoods.map((neighborhood: any) => ({
+        ...fetchedNeighborhoods.map((neighborhood) => ({
           label: neighborhood.neighborhood_name,
           value: neighborhood.neighborhood_name,
         })),
       ];
       setNeighborhoods(neighborhoodArr);
     } catch (err) {
-      Alert.alert("Error", "Failed to fetch neighborhoods. Please try again.");
+      setError("Failed to fetch neighborhoods. Please try again.");
     }
   };
 
   const handleCountrySelect = async (selectedCountry: Country) => {
-    setCountry(selectedCountry);
+    setCountry(selectedCountry.name);
     try {
-      setSignUpData({
-        ...signUpData,
-        country: selectedCountry.name,
+      await signupDataManager.setLocationData({
+        country: selectedCountry,
         state: "",
         localGovernment: "",
         neighborhood: "",
       });
+      console.log("Country data saved:", selectedCountry);
       // Reset other fields when country changes
       setState("");
       setLocalGovernment("");
       setNeighborhood("");
       setOtherNeighborhood("");
       // Fetch states for the new country
-      await fetchStates(selectedCountry.name as string);
+      await fetchStates(selectedCountry.name);
     } catch (err) {
-      Alert.alert("Error", "Error saving country data. Please try again.");
+      setError("Error saving country data. Please try again.");
+      console.error("Error saving country data:", err);
     }
   };
 
   const handleStateSelect = async (selectedState: string) => {
     setState(selectedState);
-    setLocalGovernment("");
-    setNeighborhood("");
     setLocalGovernments([]); // Clear previous local governments
     setNeighborhoods([]); // Clear previous neighborhoods
 
-    if (selectedState) {
-      try {
-        await fetchLocalGovernments(selectedState);
-      } catch (err) {
-        Alert.alert("Error", "Error fetching local governments.");
-      }
+    try {
+      fetchLocalGovernments(selectedState);
+    } catch (err) {
+      setError("Error fetching local governments.");
     }
   };
 
@@ -148,44 +143,39 @@ const Location = () => {
     selectedLocalGovernment: string
   ) => {
     setLocalGovernment(selectedLocalGovernment);
-    setNeighborhood("");
     setNeighborhoods([]); // Clear previous neighborhoods
-
-    if (selectedLocalGovernment) {
-      try {
-        await fetchNeighborhoods(selectedLocalGovernment);
-      } catch (err) {
-        Alert.alert("Error", "Error fetching neighborhoods.");
-      }
+    try {
+      await fetchNeighborhoods(selectedLocalGovernment);
+    } catch (err) {
+      setError("Error fetching neighborhoods.");
     }
   };
 
   const handleSubmit = () => {
     if (!country) {
-      Alert.alert("Validation Error", "Please select a country.");
+      Alert.alert("Validation Error", "Please select your country.");
       return;
     }
     if (!state) {
-      Alert.alert("Validation Error", "Please select a state.");
+      Alert.alert("Validation Error", "Please select your state.");
       return;
     }
     if (!localGovernment) {
-      Alert.alert("Validation Error", "Please select a local government.");
+      Alert.alert("Validation Error", "Please select your local government.");
       return;
     }
     if (!neighborhood && !otherNeighborhood) {
-      Alert.alert("Validation Error", "Please select or enter a neighborhood.");
+      Alert.alert("Validation Error", "Please select your neighborhood.");
       return;
     }
 
     setSignUpData({
       ...signUpData,
-      country: country.name,
+      country,
       state,
       localGovernment,
       neighborhood: neighborhood || otherNeighborhood,
     });
-
     router.push("/school");
   };
 
@@ -202,7 +192,7 @@ const Location = () => {
               withFilter
               withFlag
               withCountryNameButton
-              countryCode={country?.cca2 as CountryCode}
+              countryCode={country?.cca2}
               onSelect={handleCountrySelect}
               containerButtonStyle={styles.pickerButton}
               countryCodes={COUNTRIES.map((c) => c.cca2)}
@@ -232,6 +222,7 @@ const Location = () => {
           value={otherNeighborhood}
           onChangeText={setOtherNeighborhood}
         />
+        {error && <Text style={styles.errorText}>{error}</Text>}
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />
       </View>
       <Progress activeCircles={2} />
@@ -286,5 +277,11 @@ const styles = StyleSheet.create({
     color: "#969696",
     fontFamily: "ReemRegular",
     marginBottom: 30,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 10,
   },
 });
