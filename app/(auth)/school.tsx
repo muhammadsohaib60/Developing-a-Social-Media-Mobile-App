@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { signupDataManager } from "./SignupDataManager";
-import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
@@ -80,6 +80,13 @@ const School = () => {
   }, []);
 
   const handleSubmit = () => {
+    if (!school && !otherSchool) {
+      return Alert.alert("Validation Error", "Please select your school.");
+    }
+    if (!year) {
+      return Alert.alert("Validation Error", "Please select your school year.");
+    }
+
     setSignUpData({
       ...signUpData,
       secondarySchool: school || otherSchool,
@@ -105,7 +112,7 @@ const School = () => {
             items={[
               {
                 label: "Year",
-                value: "year",
+                value: "",
               },
               ...Array.from({ length: 75 }, (_, index) => ({
                 label: (2024 - index).toString(),

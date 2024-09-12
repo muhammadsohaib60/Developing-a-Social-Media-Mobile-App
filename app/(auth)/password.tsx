@@ -12,8 +12,12 @@ const Password = () => {
   const { signUpData, setSignUpData } = useGlobalContext();
 
   const handleSubmit = () => {
+    if (!password || !confirmPassword) {
+      return Alert.alert("Please fill in both password fields.");
+    }
+
     if (password !== confirmPassword) {
-      return Alert.alert("Passwords do not match");
+      return Alert.alert("Passwords do not match.");
     }
 
     setSignUpData({ ...signUpData, password });
