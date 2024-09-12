@@ -177,6 +177,33 @@ class FeedApiManager {
     }
   }
 
+  async fetchReactionOnPost(postId: number, userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("reactions")
+        .select("*")
+        .eq("post_id", postId)
+        .eq("user_id", userId)
+        .maybeSingle(); // Use maybeSingle to avoid throwing an error when no reaction exists
+
+      if (error) throw error;
+
+      // If no reaction exists, return a neutral reaction
+      if (!data) {
+        return {
+          post_id: postId,
+          user_id: userId,
+          reaction_type: "neutral", // default to neutral if no reaction is found
+        };
+      }
+
+      return data; // return the existing reaction data if found
+    } catch (error) {
+      console.error("Error fetching reaction on post:", error);
+      throw error;
+    }
+  }
+
   async postComment(postId: number, userId: string, content: string) {
     try {
       const { data, error } = await supabase.from("comments").insert([
@@ -213,7 +240,7 @@ class FeedApiManager {
         const { data: updatedReaction, error: updateError } = await supabase
           .from("reactions")
           .update({ reaction_type: reactionType })
-          .eq("id", existingReaction.id)
+          .eq("reaction_id", existingReaction.reaction_id)
           .single(); // single here because you are updating a specific reaction
 
         if (updateError) throw updateError;

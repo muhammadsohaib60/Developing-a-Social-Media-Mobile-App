@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -51,6 +51,11 @@ const PostComponent = ({ post }: { post: Post }) => {
     }
   };
 
+  const getReaction = async () => {
+    const data = await feedApiManager.fetchReactionOnPost(post.posts_id, "41");
+    setReaction(data.reaction_type);
+  };
+
   const onScroll = (event: any) => {
     const slideIndex = Math.ceil(
       event.nativeEvent.contentOffset.x /
@@ -77,6 +82,7 @@ const PostComponent = ({ post }: { post: Post }) => {
 
     setSelectedReaction(reaction);
     setReactionModalVisible(false);
+    getReaction();
   };
 
   const getComments = async (id: any) => {
@@ -84,6 +90,10 @@ const PostComponent = ({ post }: { post: Post }) => {
     setComments(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    getReaction();
+  });
 
   return (
     <View style={styles.postContainer}>
@@ -142,7 +152,13 @@ const PostComponent = ({ post }: { post: Post }) => {
 
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => setReactionModalVisible(true)}>
-          <Image source={like} style={styles.icon} />
+          {reaction === "like" ? (
+            <Text style={{ color: "black", fontSize: 20 }}>👍</Text>
+          ) : reaction === "dislike" ? (
+            <Text style={{ color: "black", fontSize: 20 }}>👎 </Text>
+          ) : (
+            <Image source={like} style={styles.icon} />
+          )}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => toggleComments(Number(post.posts_id))}>
           <Image source={comment} style={styles.icon} />
