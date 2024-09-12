@@ -48,7 +48,7 @@ class FeedApiManager {
     created_at: string
   ): Promise<{ post: Post | null, failedUploads: number }> {
     let failedUploads = 0;
-    const uploadedFiles: string[] = [];
+    const uploadedFileUrls: string[] = [];
   
     try {
       for (const fileUri of files) {
@@ -71,7 +71,7 @@ class FeedApiManager {
           // Read the file contents
           const fileContent = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.Base64 });
   
-          const { error: uploadError } = await supabase.storage
+          const { data, error: uploadError } = await supabase.storage
             .from('posts')
             .upload(filePath, fileContent, {
               contentType: this.getContentType(fileName),
@@ -79,19 +79,26 @@ class FeedApiManager {
   
           if (uploadError) throw uploadError;
   
-          uploadedFiles.push(filePath);
+          // Get the public URL for the uploaded file
+          const { data: { publicUrl }, error: urlError } = supabase.storage
+            .from('posts')
+            .getPublicUrl(filePath);
+  
+          if (urlError) throw urlError;
+  
+          uploadedFileUrls.push(publicUrl);
         } catch (error) {
           console.error("Error uploading file:", error);
           failedUploads++;
         }
       }
   
-      if (uploadedFiles.length > 0) {
+      if (uploadedFileUrls.length > 0) {
         const { data, error: insertError } = await supabase
           .from('posts')
           .insert({
             user_id: userId,
-            content_path:  uploadedFiles,
+            content_path: uploadedFileUrls,
             caption: caption,
             created_at: created_at
           })
@@ -179,7 +186,7 @@ class FeedApiManager {
       throw error;
     }
   }
-  
+
   private generateUniqueFileName(originalName: string): string {
     const timestamp = new Date().getTime();
     const randomString = Math.random().toString(36).substring(2, 8);
