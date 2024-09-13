@@ -139,10 +139,23 @@ const StoryScreen = () => {
                       style={styles.media}
                       resizeMode={ResizeMode.CONTAIN}
                       isLooping
-                      shouldPlay={true} // Set the video to play automatically
+                      shouldPlay={true}
                       onLoadStart={() => console.log("Video is loading...")}
-                      onLoad={() => console.log("Video loaded!")}
-                      onError={(error) => console.log("Video error: ", error)}
+                      onLoad={(data) => {
+                        console.log("Video loaded!", data);
+                        console.log("Video dimensions:", data.naturalSize);
+                        console.log("Video duration:", data.duration);
+                      }}
+                      onError={(error) => {
+                        console.error("Video error: ", error);
+                        console.error(
+                          "Error object:",
+                          JSON.stringify(error, null, 2)
+                        );
+                      }}
+                      onPlaybackStatusUpdate={(status) =>
+                        console.log("Playback status:", status)
+                      }
                     />
                   ) : (
                     <Text>Invalid media</Text>

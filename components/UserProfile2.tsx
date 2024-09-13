@@ -1,33 +1,65 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { setUser } from "@/constants/date-setter";
 import { router } from "expo-router";
+import { feedApiManager } from "@/app/(root)/FeedApiManager";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserProfile = () => {
-  const user = setUser();
+  const [user, setUser] = useState<any>(null);
+
+  const fetchUser = async () => {
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+
+    const data = await feedApiManager.getUserProfile(userId);
+    setUser(data);
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  if (!user) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color="purple" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.username}>{user.username}</Text>
+        <Text style={styles.username}>{user.user_name}</Text>
       </View>
       <View style={styles.profileSection}>
         <View style={styles.textSection}>
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.jobTitle}>{user.jobTitle}</Text>
-          <Text style={styles.tags}>
-            {user.tags.map((tag, index) => (
-              <Text key={index} style={styles.tagText}>
-                #{tag}{" "}
-              </Text>
-            ))}
-          </Text>
-          <Text style={styles.phone}>{user.phone}</Text>
+          <Text style={styles.name}>{user.full_name}</Text>
+          <Text style={styles.phone}>{user.phone_number}</Text>
           <Text style={styles.email}>{user.email}</Text>
         </View>
 
-        <Image source={user.profileImage} style={styles.profileImage} />
+        <Image
+          source={{ uri: user.profile_picture }}
+          style={styles.profileImage}
+        />
       </View>
       <View
         style={{
@@ -101,8 +133,9 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 100,
     height: 100,
-    borderRadius: 40,
+    borderRadius: 50,
     marginLeft: 20,
+    marginBottom: 10,
   },
   button: {
     backgroundColor: "#FFD700",

@@ -1,11 +1,21 @@
 import { FlatList, StyleSheet, Text, View, Image } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import GradientView from "@/components/GradientView";
 import { setFlags } from "@/constants/date-setter";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = setFlags();
 
 const Flag = () => {
+  const [reaction, setReaction] = useState<any[]>([]);
+
+  const getReactions = async () => {
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+  };
+
   const renderItem = ({ item }: any) => {
     return (
       <View style={styles.container}>

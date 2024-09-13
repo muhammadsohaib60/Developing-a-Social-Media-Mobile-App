@@ -57,7 +57,7 @@ class FeedApiManager {
   ): Promise<{ post: Post | null; failedUploads: number }> {
     let failedUploads = 0;
     const uploadedFiles: string[] = [];
-  
+
     try {
       for (const fileUri of files) {
         try {
@@ -66,48 +66,52 @@ class FeedApiManager {
             failedUploads++;
             continue;
           }
-  
+
           const fileName = fileUri.split("/").pop();
           if (!fileName) {
             console.error("Could not extract file name from URI");
             failedUploads++;
             continue;
           }
-  
+
           const filePath = `${userId}/${fileName}`;
-  
+
           // Read the file contents
           const fileContent = await FileSystem.readAsStringAsync(fileUri, {
             encoding: FileSystem.EncodingType.Base64,
           });
-  
+
           // Convert Base64 to Uint8Array
-          const uint8Array = new Uint8Array(atob(fileContent).split('').map(char => char.charCodeAt(0)));
-  
+          const uint8Array = new Uint8Array(
+            atob(fileContent)
+              .split("")
+              .map((char) => char.charCodeAt(0))
+          );
+
           const { error: uploadError } = await supabase.storage
             .from("posts")
             .upload(filePath, uint8Array, {
               contentType: this.getContentType(fileName),
             });
-  
+
           if (uploadError) throw uploadError;
-  
+
           // Get the public URL for the uploaded file
           const { data: urlData } = supabase.storage
             .from("posts")
             .getPublicUrl(filePath);
-  
+
           if (!urlData || !urlData.publicUrl) {
             throw new Error("Failed to get public URL for uploaded file");
           }
-  
+
           uploadedFiles.push(urlData.publicUrl);
         } catch (error) {
           console.error("Error uploading file:", error);
           failedUploads++;
         }
       }
-  
+
       if (uploadedFiles.length > 0) {
         const { data, error: insertError } = await supabase
           .from("posts")
@@ -119,9 +123,9 @@ class FeedApiManager {
           })
           .select()
           .single();
-  
+
         if (insertError) throw insertError;
-  
+
         return { post: data as Post, failedUploads };
       } else {
         throw new Error("All file uploads failed");
@@ -131,7 +135,7 @@ class FeedApiManager {
       return { post: null, failedUploads };
     }
   }
-  
+
   private getContentType(fileName: string): string {
     const extension = fileName.split(".").pop()?.toLowerCase();
     switch (extension) {
@@ -150,7 +154,7 @@ class FeedApiManager {
         return "application/octet-stream";
     }
   }
-  
+
   async getPosts(limit: number = 10, offset: number = 0): Promise<Post[]> {
     try {
       const { data, error } = await supabase
@@ -371,56 +375,67 @@ class FeedApiManager {
     try {
       console.log("Starting story upload process...");
       console.log("File object:", file);
-  
+
       if (!file || !file.uri) {
         console.error("Invalid file object");
         return { story: null, failed: true, error: "Invalid file object" };
       }
-  
+
       const originalFileName = file.uri.split("/").pop();
       if (!originalFileName) {
         console.error("Could not extract file name from URI");
-        return { story: null, failed: true, error: "Could not extract file name" };
+        return {
+          story: null,
+          failed: true,
+          error: "Could not extract file name",
+        };
       }
-  
+
       const uniqueFileName = this.generateUniqueFileName(originalFileName);
       const filePath = `${userId}/${uniqueFileName}`;
       console.log("File path for upload:", filePath);
-  
+
       // Read the file contents
       console.log("Reading file contents...");
       const fileContent = await FileSystem.readAsStringAsync(file.uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      console.log("File content read successfully. Length:", fileContent.length);
-  
+      console.log(
+        "File content read successfully. Length:",
+        fileContent.length
+      );
+
       // Convert Base64 to Uint8Array
-      const uint8Array = new Uint8Array(atob(fileContent).split('').map(char => char.charCodeAt(0)));
-  
+      const uint8Array = new Uint8Array(
+        atob(fileContent)
+          .split("")
+          .map((char) => char.charCodeAt(0))
+      );
+
       console.log("Uploading to Supabase storage...");
       const { error: uploadError } = await supabase.storage
         .from("stories")
         .upload(filePath, uint8Array, {
           contentType: file.mimeType || this.getContentType(originalFileName),
         });
-  
+
       if (uploadError) {
         console.error("Supabase storage upload error:", uploadError);
         throw uploadError;
       }
-  
+
       // Get the public URL for the uploaded file
       const { data: urlData } = supabase.storage
         .from("stories")
         .getPublicUrl(filePath);
-  
+
       if (!urlData || !urlData.publicUrl) {
         throw new Error("Failed to get public URL for uploaded file");
       }
-  
+
       const publicUrl = urlData.publicUrl;
       console.log("Public URL for uploaded file:", publicUrl);
-  
+
       console.log("File uploaded successfully. Creating database entry...");
       const { data, error: insertError } = await supabase
         .from("stories")
@@ -431,12 +446,12 @@ class FeedApiManager {
         })
         .select()
         .single();
-  
+
       if (insertError) {
         console.error("Database insert error:", insertError);
         throw insertError;
       }
-  
+
       console.log("Story created successfully:", data);
       return { story: data as Story, failed: false };
     } catch (error) {
@@ -498,6 +513,112 @@ class FeedApiManager {
       return stories;
     } catch (error) {
       console.error("Error fetching today's stories:", error);
+      throw error;
+    }
+  }
+
+  async getUserProfile(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("user_details")
+        .select(
+          `
+          username,
+          user_id,
+          full_name,
+          email,
+          phone_number,
+          profile_pictures
+          `
+        )
+        .eq("user_id", userId)
+        .single();
+
+      if (error) throw error;
+
+      const user = {
+        user_name: data?.username || "",
+        user_id: data?.user_id || "",
+        full_name: data?.full_name || "",
+        email: data?.email || "",
+        phone_number: data?.phone_number || "",
+        profile_picture: data?.profile_pictures?.[0] || null,
+      };
+
+      console.log(user);
+
+      return user;
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      throw error;
+    }
+  }
+
+  async getUserPosts(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(
+          `
+          posts_id,
+           content_path
+          `
+        )
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const posts = data.map((post: any) => ({
+        content_path: post.content_path[0],
+        id: post.posts_id,
+      }));
+
+      return posts;
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+      throw error;
+    }
+  }
+
+  async getUserReactions(userId: string) {
+    //get like or dislike , the name of the post owner and url of the post and caption
+
+    try {
+      const { data, error } = await supabase
+        .from("reactions")
+        .select(
+          `
+          reaction_id,
+          post_id,
+          reaction_type,
+          post_details:posts(posts_id, user_id, content_path, caption, created_at, user_details(username))
+          `
+        )
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .neq("reaction_type", "neutral");
+      if (error) throw error;
+
+      const reactions = data.map((reaction: any) => ({
+        reaction_id: reaction.reaction_id,
+        post_id: reaction.post_id,
+        reaction_type: reaction.reaction_type,
+        post_details: {
+          posts_id: reaction.post_details.posts_id,
+          user_id: reaction.post_details.user_id,
+          content_path: reaction.post_details.content_path[0],
+          caption: reaction.post_details.caption,
+          created_at: reaction.post_details.created_at,
+          user_details: {
+            username: reaction.post_details.user_details.username,
+          },
+        },
+      }));
+
+      return reactions;
+    } catch (error) {
+      console.error("Error fetching user reactions:", error);
       throw error;
     }
   }

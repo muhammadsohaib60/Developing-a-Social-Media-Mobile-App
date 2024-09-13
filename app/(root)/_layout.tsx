@@ -195,6 +195,7 @@ const RootLayout = () => {
           options={{
             headerShown: false,
             tabBarButton: () => null,
+            unmountOnBlur: true,
           }}
         />
       </Tabs>
