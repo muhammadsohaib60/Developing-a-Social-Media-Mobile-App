@@ -42,8 +42,8 @@ const AddStory = () => {
     setUploadStatus("Starting upload...");
 
     try {
-      const userId = await AsyncStorage.getItem('userId');
-      
+      const userId = await AsyncStorage.getItem("userId");
+
       if (!userId) {
         throw new Error("User ID not found");
       }
@@ -51,7 +51,9 @@ const AddStory = () => {
       const created_at = new Date().toISOString();
 
       for (const item of media) {
-        setUploadStatus(`Uploading ${media.indexOf(item) + 1} of ${media.length}...`);
+        setUploadStatus(
+          `Uploading ${media.indexOf(item) + 1} of ${media.length}...`
+        );
         const result = await feedApiManager.uploadStoryAndCreateEntry(
           userId,
           item,
@@ -99,7 +101,11 @@ const AddStory = () => {
 
         {/* Submit Button */}
         <TouchableOpacity
-          style={[styles.button, styles.submitButton, isUploading && styles.disabledButton]}
+          style={[
+            styles.button,
+            styles.submitButton,
+            isUploading && styles.disabledButton,
+          ]}
           onPress={handleSubmit}
           disabled={isUploading}
         >

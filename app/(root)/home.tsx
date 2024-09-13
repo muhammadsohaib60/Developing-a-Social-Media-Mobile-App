@@ -13,6 +13,7 @@ import PostComponent from "@/components/PostComponent";
 import { setPost } from "@/constants/date-setter";
 import { feedApiManager } from "./FeedApiManager";
 import { useFocusEffect } from "expo-router";
+import { ScrollView } from "react-native-gesture-handler";
 
 const Home = () => {
   const [posts, setPosts] = useState<any>([]);

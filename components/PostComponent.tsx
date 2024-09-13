@@ -11,13 +11,14 @@ import {
   Modal,
   Share,
   ActivityIndicator,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { ResizeMode, Video } from "expo-av";
 import { comment, like, share } from "@/constants/icons";
-import { user } from "@/constants/images";
 import { router } from "expo-router";
 import { feedApiManager, Post } from "@/app/(root)/FeedApiManager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AntDesign } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -31,6 +32,16 @@ const PostComponent = ({ post }: { post: Post }) => {
   const [selectedReaction, setSelectedReaction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reaction, setReaction] = useState("neutral");
+  const [showIcon, setShowIcon] = useState(false); // To show/hide play/pause icon
+  const [shouldPlay, setShouldPlay] = useState(false);
+
+  const isImage = (url: string) => {
+    return /\.(jpg|jpeg|png|gif|tiff|bmp|svg|webp|heif|heic)$/i.test(url);
+  };
+
+  const isVideo = (url: string) => {
+    return /\.(mp4|avi|mov|wmv|flv|mkv|webm|mpeg)$/i.test(url);
+  };
 
   const sharePost = async () => {
     try {
@@ -107,6 +118,12 @@ const PostComponent = ({ post }: { post: Post }) => {
     setLoading(false);
   };
 
+  const handleTap = () => {
+    setShouldPlay(!shouldPlay);
+    setShowIcon(true);
+    setTimeout(() => setShowIcon(false), 2000);
+  };
+
   useEffect(() => {
     getReaction();
   });
@@ -137,20 +154,40 @@ const PostComponent = ({ post }: { post: Post }) => {
       >
         {post.content_path.map((media: string, index: any) => (
           <View key={index} style={styles.mediaWrapper}>
-            {media[0] === "3" ? (
+            {isImage(media) ? (
               <Image
                 source={{ uri: media }}
                 style={styles.media}
                 resizeMode="contain"
               />
             ) : (
-              <Video
-                source={{ uri: media } as any}
-                style={styles.media}
-                resizeMode={ResizeMode.CONTAIN}
-                shouldPlay
-                isLooping
-              />
+              <TouchableWithoutFeedback
+                style={{ backgroundColor: "transparent" }}
+                onPress={handleTap}
+              >
+                <View style={{ width: "100%" }}>
+                  <Video
+                    source={{ uri: media } as any}
+                    style={styles.media}
+                    resizeMode={ResizeMode.CONTAIN}
+                    shouldPlay={shouldPlay && activeIndex === index}
+                    isLooping
+                  />
+                  {showIcon && (
+                    <View style={styles.iconOverlay}>
+                      {shouldPlay ? (
+                        <AntDesign
+                          name="pausecircleo"
+                          size={40}
+                          color="white"
+                        />
+                      ) : (
+                        <AntDesign name="playcircleo" size={40} color="white" />
+                      )}
+                    </View>
+                  )}
+                </View>
+              </TouchableWithoutFeedback>
             )}
           </View>
         ))}
@@ -289,11 +326,12 @@ const styles = StyleSheet.create({
   },
   mediaWrapper: {
     width: width - 64,
-    height: 200,
+    height: 300,
     borderRadius: 12,
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "black",
   },
   media: {
     width: "100%",
@@ -398,4 +436,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  iconOverlay: { position: "absolute", top: "45%", left: "45%" },
 });

@@ -16,7 +16,6 @@ import {
 } from "react-native-gesture-handler";
 import { router, useFocusEffect } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { setStories2 } from "@/constants/date-setter";
 import { feedApiManager } from "./FeedApiManager";
 
 interface StoryComponentProps {
@@ -32,19 +31,16 @@ interface StoryComponentProps {
 
 const { width, height } = Dimensions.get("window");
 
-const stories = setStories2();
-
 const StoryScreen = () => {
   const onClose = () => {
     router.push("/home");
   };
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const videoRef = useRef(null);
+  const videoRef = useRef<any>(null);
 
   const [stories, setStories] = useState<StoryComponentProps[]>([]);
   const [loading, setLoading] = useState(true);
-
   const handleNext = () => {
     if (currentIndex < stories.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -73,6 +69,18 @@ const StoryScreen = () => {
   useEffect(() => {
     getStories();
   }, []);
+
+  const isImage = (url: string) => {
+    url = url.replace(/^\["|"\]$/g, "");
+
+    return /\.(jpg|jpeg|png|gif|tiff|bmp|svg|webp|heif|heic)$/i.test(url);
+  };
+
+  const isVideo = (url: string) => {
+    url = url.replace(/^\["|"\]$/g, "");
+
+    return /\.(mp4|avi|mov|wmv|flv|mkv|webm|mpeg)$/i.test(url);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -106,21 +114,40 @@ const StoryScreen = () => {
             }}
           >
             <View style={styles.content}>
-              {stories[currentIndex].content_path[0] === "3" ? (
+              {isImage(stories[currentIndex].content_path) ? (
                 <Image
-                  source={{ uri: stories[currentIndex].content_path }}
+                  source={{
+                    uri: stories[currentIndex].content_path.replace(
+                      /^\["|"\]$/g,
+                      ""
+                    ),
+                  }}
                   style={styles.media}
                   resizeMode="contain"
                 />
               ) : (
-                <Video
-                  ref={videoRef}
-                  source={{ uri: stories[currentIndex].content_path }}
-                  style={styles.media}
-                  resizeMode={ResizeMode.CONTAIN}
-                  shouldPlay
-                  isLooping
-                />
+                <>
+                  {isVideo(stories[currentIndex].content_path) ? (
+                    <Video
+                      ref={videoRef}
+                      source={{
+                        uri: stories[currentIndex].content_path.replace(
+                          /^\["|"\]$/g,
+                          ""
+                        ),
+                      }}
+                      style={styles.media}
+                      resizeMode={ResizeMode.CONTAIN}
+                      isLooping
+                      shouldPlay={true} // Set the video to play automatically
+                      onLoadStart={() => console.log("Video is loading...")}
+                      onLoad={() => console.log("Video loaded!")}
+                      onError={(error) => console.log("Video error: ", error)}
+                    />
+                  ) : (
+                    <Text>Invalid media</Text>
+                  )}
+                </>
               )}
             </View>
           </PanGestureHandler>

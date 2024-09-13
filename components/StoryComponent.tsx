@@ -84,7 +84,10 @@ const StoryComponent = () => {
             colors={["#FFD700", "#FFD700"]}
             style={styles.storyCircle}
           >
-            <Image source={item.imageUrl} style={styles.storyImage} />
+            <Image
+              source={{ uri: item.user_details.profile_picture }}
+              style={styles.storyImage}
+            />
           </LinearGradient>
         </TouchableOpacity>
       );
@@ -95,6 +98,7 @@ const StoryComponent = () => {
     <View
       style={{
         paddingHorizontal: 20,
+        marginBottom: 10,
       }}
     >
       <FlatList

@@ -2,7 +2,7 @@ import { signUpProps } from "@/constants/types";
 import { supabase } from "../supabaseClient"; // Adjust this path as needed
 import * as FileSystem from "expo-file-system";
 import { decode } from "base-64";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const signup = async (data: signUpProps) => {
   console.log("Signup data:", data);
@@ -68,7 +68,7 @@ async function uploadImageToBucket(
 
   while (retries < MAX_RETRIES) {
     try {
-      //console.log(`Attempting to upload image (attempt ${retries + 1}): ${uri}`);
+      //console.log(Attempting to upload image (attempt ${retries + 1}): ${uri});
 
       // Check if file exists and is readable
       const fileInfo = await FileSystem.getInfoAsync(uri);
@@ -81,13 +81,20 @@ async function uploadImageToBucket(
         encoding: FileSystem.EncodingType.Base64,
       });
 
+      // Convert Base64 to Uint8Array
+      const uint8Array = new Uint8Array(
+        atob(base64)
+          .split("")
+          .map((char) => char.charCodeAt(0))
+      );
+
       const fileName = `${username}_${index + 1}.jpg`;
       const filePath = `images_user_signup/${fileName}`;
 
-      //console.log(`Uploading to Supabase: ${filePath}`);
+      //console.log(Uploading to Supabase: ${filePath});
       const { data, error } = await supabase.storage
         .from("images_user_signup")
-        .upload(filePath, base64, {
+        .upload(filePath, uint8Array, {
           contentType: "image/jpeg",
           upsert: true,
         });
@@ -98,10 +105,10 @@ async function uploadImageToBucket(
         data: { publicUrl },
       } = supabase.storage.from("images_user_signup").getPublicUrl(filePath);
 
-      //console.log(`Upload successful, public URL: ${publicUrl}`);
+      //console.log(Upload successful, public URL: ${publicUrl});
       return publicUrl;
     } catch (error) {
-      // console.error(`Error in uploadImageToBucket (attempt ${retries + 1}):`, error);
+      // console.error(Error in uploadImageToBucket (attempt ${retries + 1}):, error);
       retries++;
       if (retries >= MAX_RETRIES) {
         throw error;
@@ -188,12 +195,12 @@ export const signin = async (emailOrPhone: string, password: string) => {
     }
 
     // Store user_id in AsyncStorage
-    await AsyncStorage.setItem('userId', user.user_id.toString());
+    await AsyncStorage.setItem("userId", user.user_id.toString());
     console.log("Stored user ID:", user.user_id.toString());
 
     // Clear all other AsyncStorage items
     const allKeys = await AsyncStorage.getAllKeys();
-    const keysToRemove = allKeys.filter(key => key !== 'userId');
+    const keysToRemove = allKeys.filter((key) => key !== "userId");
     await AsyncStorage.multiRemove(keysToRemove);
 
     //console.log('User signed in successfully:', user);
