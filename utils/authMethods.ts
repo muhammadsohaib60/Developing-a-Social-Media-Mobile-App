@@ -119,7 +119,6 @@ async function uploadImageToBucket(
   }
   throw new Error("Max retries reached for image upload");
 }
-
 export const uploadImagesAndUpdateUser = async (
   userId: number,
   images: string[],
