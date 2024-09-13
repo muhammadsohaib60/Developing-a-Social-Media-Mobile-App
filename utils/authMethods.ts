@@ -81,13 +81,16 @@ async function uploadImageToBucket(
         encoding: FileSystem.EncodingType.Base64,
       });
 
+      // Convert Base64 to Uint8Array
+      const uint8Array = new Uint8Array(atob(base64).split('').map(char => char.charCodeAt(0)));
+
       const fileName = `${username}_${index + 1}.jpg`;
       const filePath = `images_user_signup/${fileName}`;
 
       //console.log(`Uploading to Supabase: ${filePath}`);
       const { data, error } = await supabase.storage
         .from("images_user_signup")
-        .upload(filePath, base64, {
+        .upload(filePath, uint8Array, {
           contentType: "image/jpeg",
           upsert: true,
         });
@@ -112,7 +115,6 @@ async function uploadImageToBucket(
   }
   throw new Error("Max retries reached for image upload");
 }
-
 export const uploadImagesAndUpdateUser = async (
   userId: number,
   images: string[],
