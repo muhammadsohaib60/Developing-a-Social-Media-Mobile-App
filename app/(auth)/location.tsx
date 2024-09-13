@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { SafeAreaView, StyleSheet, TextInput, View, Text } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  View,
+  Text,
+  Alert,
+} from "react-native";
 import CountryPicker, {
   Country,
   CountryCode,
@@ -145,12 +152,23 @@ const Location = () => {
   };
 
   const handleSubmit = () => {
-    console.log({
-      country,
-      state,
-      localGovernment,
-      neighborhood: neighborhood || otherNeighborhood,
-    });
+    if (!country) {
+      Alert.alert("Validation Error", "Please select your country.");
+      return;
+    }
+    if (!state) {
+      Alert.alert("Validation Error", "Please select your state.");
+      return;
+    }
+    if (!localGovernment) {
+      Alert.alert("Validation Error", "Please select your local government.");
+      return;
+    }
+    if (!neighborhood && !otherNeighborhood) {
+      Alert.alert("Validation Error", "Please select your neighborhood.");
+      return;
+    }
+
     setSignUpData({
       ...signUpData,
       country,
@@ -159,12 +177,6 @@ const Location = () => {
       neighborhood: neighborhood || otherNeighborhood,
     });
     router.push("/school");
-
-    // if (country && state && localGovernment && neighborhood) {
-    //   router.push("/school");
-    // } else {
-    //   setError("Please select all location fields before proceeding.");
-    // }
   };
 
   return (

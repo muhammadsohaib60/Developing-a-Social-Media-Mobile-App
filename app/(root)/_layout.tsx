@@ -179,6 +179,7 @@ const RootLayout = () => {
           name="stories"
           options={{
             headerShown: false,
+            unmountOnBlur: true,
             tabBarButton: () => null,
           }}
         />

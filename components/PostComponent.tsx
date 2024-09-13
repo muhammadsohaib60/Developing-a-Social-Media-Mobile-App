@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -10,35 +10,27 @@ import {
   TouchableOpacity,
   Modal,
   Share,
+  ActivityIndicator,
 } from "react-native";
 import { ResizeMode, Video } from "expo-av";
 import { comment, like, share } from "@/constants/icons";
 import { user } from "@/constants/images";
 import { router } from "expo-router";
+import { feedApiManager, Post } from "@/app/(root)/FeedApiManager";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
-const PostComponent = ({ post }: any) => {
+const PostComponent = ({ post }: { post: Post }) => {
   const scrollRef = useRef<any>();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      userName: "John Doe",
-      userImage: user,
-      text: "This looks awesome!",
-    },
-    {
-      id: 2,
-      userName: "Jane Smith",
-      userImage: user,
-      text: "Great party!",
-    },
-  ]);
+  const [comments, setComments] = useState<any>([]);
   const [reactionModalVisible, setReactionModalVisible] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [reaction, setReaction] = useState("neutral");
 
   const sharePost = async () => {
     try {
@@ -60,6 +52,18 @@ const PostComponent = ({ post }: any) => {
     }
   };
 
+  const getReaction = async () => {
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+    const data = await feedApiManager.fetchReactionOnPost(
+      post.posts_id,
+      userId
+    );
+    setReaction(data.reaction_type);
+  };
+
   const onScroll = (event: any) => {
     const slideIndex = Math.ceil(
       event.nativeEvent.contentOffset.x /
@@ -68,38 +72,58 @@ const PostComponent = ({ post }: any) => {
     setActiveIndex(slideIndex);
   };
 
-  const toggleComments = () => {
+  const toggleComments = (id: any) => {
     setShowComments(!showComments);
+    getComments(id);
   };
 
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      setComments([
-        ...comments,
-        {
-          id: comments.length + 1,
-          userName: "You",
-          userImage: user,
-          text: newComment,
-        },
-      ]);
-      setNewComment("");
+  const handleAddComment = async () => {
+    if (newComment.trim() === "") {
+      return;
     }
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+    await feedApiManager.postComment(post.posts_id, userId, newComment);
+    getComments(post.posts_id);
   };
 
-  const handleReaction = (reaction: any) => {
+  const handleReaction = async (reaction: any) => {
+    const userId = await AsyncStorage.getItem("userId");
+    if (!userId) {
+      return;
+    }
+    await feedApiManager.reactOnPost(post.posts_id, userId, reaction);
+
     setSelectedReaction(reaction);
     setReactionModalVisible(false);
+    getReaction();
   };
+
+  const getComments = async (id: any) => {
+    const data = await feedApiManager.getCommentsForPost(id);
+    setComments(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getReaction();
+  });
 
   return (
     <View style={styles.postContainer}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push("/otherprofile")}>
-          <Image source={post.user.profileImage} style={styles.profileImage} />
+          <Image
+            source={{
+              uri: post.user_details.profile_picture,
+            }}
+            style={styles.profileImage}
+          />
         </TouchableOpacity>
 
-        <Text style={styles.userName}>{post.user.name}</Text>
+        <Text style={styles.userName}>{post.user_details.username}</Text>
       </View>
       <Text style={styles.caption}>{post.caption}</Text>
       <ScrollView
@@ -111,17 +135,17 @@ const PostComponent = ({ post }: any) => {
         scrollEventThrottle={16}
         contentContainerStyle={styles.mediaContainer}
       >
-        {post.postMedia.map((media: any, index: any) => (
+        {post.content_path.map((media: string, index: any) => (
           <View key={index} style={styles.mediaWrapper}>
-            {media.type === "image" ? (
+            {media[0] === "3" ? (
               <Image
-                source={media.src}
+                source={{ uri: media }}
                 style={styles.media}
                 resizeMode="contain"
               />
             ) : (
               <Video
-                source={media.src}
+                source={{ uri: media } as any}
                 style={styles.media}
                 resizeMode={ResizeMode.CONTAIN}
                 shouldPlay
@@ -132,7 +156,7 @@ const PostComponent = ({ post }: any) => {
         ))}
       </ScrollView>
       <View style={styles.pagination}>
-        {post.postMedia.map((_: any, index: any) => (
+        {post.content_path.map((_: any, index: any) => (
           <Text
             key={index}
             style={index === activeIndex ? styles.activeDot : styles.dot}
@@ -144,9 +168,15 @@ const PostComponent = ({ post }: any) => {
 
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => setReactionModalVisible(true)}>
-          <Image source={like} style={styles.icon} />
+          {reaction === "like" ? (
+            <Text style={{ color: "black", fontSize: 20 }}>👍</Text>
+          ) : reaction === "dislike" ? (
+            <Text style={{ color: "black", fontSize: 20 }}>👎 </Text>
+          ) : (
+            <Image source={like} style={styles.icon} />
+          )}
         </TouchableOpacity>
-        <TouchableOpacity onPress={toggleComments}>
+        <TouchableOpacity onPress={() => toggleComments(Number(post.posts_id))}>
           <Image source={comment} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={sharePost}>
@@ -154,32 +184,41 @@ const PostComponent = ({ post }: any) => {
         </TouchableOpacity>
       </View>
 
-      {showComments && (
-        <View style={styles.commentSection}>
-          <TextInput
-            style={styles.input}
-            placeholder="Add a comment..."
-            value={newComment}
-            onChangeText={setNewComment}
-          />
-          <TouchableOpacity onPress={handleAddComment} style={styles.addButton}>
-            <Text style={styles.addButtonText}>Add Comment</Text>
-          </TouchableOpacity>
-          <Text style={styles.commentTitle}>Comments</Text>
-          {comments.map((comment) => (
-            <View key={comment.id} style={styles.commentContainer}>
-              <Image
-                source={comment.userImage}
-                style={styles.commentUserImage}
-              />
-              <View>
-                <Text style={styles.commentUserName}>{comment.userName}</Text>
-                <Text style={styles.commentText}>{comment.text}</Text>
+      {showComments &&
+        (loading ? (
+          <ActivityIndicator size="large" color="purple" />
+        ) : (
+          <View style={styles.commentSection}>
+            <TextInput
+              style={styles.input}
+              placeholder="Add a comment..."
+              value={newComment}
+              onChangeText={setNewComment}
+            />
+            <TouchableOpacity
+              onPress={handleAddComment}
+              style={styles.addButton}
+            >
+              <Text style={styles.addButtonText}>Add Comment</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.commentTitle}>Comments</Text>
+            {comments.map((comment: any) => (
+              <View key={comment.id} style={styles.commentContainer}>
+                <Image
+                  source={{ uri: comment.user_details.profile_picture }}
+                  style={styles.commentUserImage}
+                />
+                <View>
+                  <Text style={styles.commentUserName}>
+                    {comment.user_details.username}
+                  </Text>
+                  <Text style={styles.commentText}>{comment.content}</Text>
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
-      )}
+            ))}
+          </View>
+        ))}
 
       {/* Reaction Modal */}
       <Modal

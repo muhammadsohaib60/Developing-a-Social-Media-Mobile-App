@@ -1,4 +1,11 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
@@ -26,6 +33,10 @@ const Sports = () => {
   ]);
 
   const handleSubmit = () => {
+    if (!sportsClub && !otherSportsClub) {
+      return Alert.alert("Validation Error", "Please select a sports club.");
+    }
+
     setSignUpData({
       ...signUpData,
       sportsClub: sportsClub || otherSportsClub,

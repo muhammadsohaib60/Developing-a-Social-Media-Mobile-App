@@ -1,4 +1,11 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
@@ -27,6 +34,13 @@ const Politics = () => {
   ]);
 
   const handleSubmit = () => {
+    if (!party && !otherParty) {
+      return Alert.alert(
+        "Validation Error",
+        "Please select a political party."
+      );
+    }
+
     setSignUpData({
       ...signUpData,
       politicalParty: party || otherParty,

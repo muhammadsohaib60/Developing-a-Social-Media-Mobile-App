@@ -8,7 +8,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { Video } from "expo-av";
+import { ResizeMode, Video } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import GradientView from "@/components/GradientView";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,7 +26,7 @@ const AddPost = () => {
       allowsMultipleSelection: true,
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       console.log("Selected media:", result.assets);
       setMedia((prevMedia: any) => [...prevMedia, ...result.assets]);
@@ -38,40 +38,48 @@ const AddPost = () => {
       Alert.alert("Error", "Please select at least one image or video");
       return;
     }
-  
+
     setIsUploading(true);
-  
+
     try {
-      const userId = await AsyncStorage.getItem('userId');
-      
+      const userId = await AsyncStorage.getItem("userId");
+
       if (!userId) {
         throw new Error("User ID not found");
       }
-  
+
       // Extract URIs from media objects
       const fileUris = media.map((item: any) => item.uri).filter(Boolean);
-  
+
       if (fileUris.length === 0) {
         throw new Error("No valid file URIs found");
       }
-  
+
       const created_at = new Date().toISOString();
-  
+
       console.log("Uploading files:", fileUris);
-  
+
       const result = await feedApiManager.uploadFilesAndCreatePost(
         userId,
         fileUris,
         caption,
         created_at
       );
-  
+
       if (result.post) {
         Alert.alert("Success", "Post created successfully!");
         setCaption("");
         setMedia([]);
-      } else if (result.failedUploads > 0 && result.failedUploads < fileUris.length) {
-        Alert.alert("Partial Success", `Post created with ${fileUris.length - result.failedUploads} out of ${fileUris.length} files. Some files failed to upload.`);
+      } else if (
+        result.failedUploads > 0 &&
+        result.failedUploads < fileUris.length
+      ) {
+        Alert.alert(
+          "Partial Success",
+          `Post created with ${fileUris.length - result.failedUploads} out of ${
+            fileUris.length
+          } files. Some files failed to upload.`
+        );
         setCaption("");
         setMedia([]);
       } else {
@@ -84,7 +92,7 @@ const AddPost = () => {
       setIsUploading(false);
     }
   };
-  
+
   return (
     <GradientView>
       <View style={styles.container}>
@@ -114,7 +122,11 @@ const AddPost = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.submitButton, isUploading && styles.disabledButton]}
+          style={[
+            styles.button,
+            styles.submitButton,
+            isUploading && styles.disabledButton,
+          ]}
           onPress={handleSubmit}
           disabled={isUploading}
         >
@@ -154,7 +166,7 @@ const styles = {
   media: {
     width: 200,
     height: 400,
-    resizeMode: "contain",
+    resizeMode: ResizeMode.COVER,
   },
   button: {
     flexDirection: "row",

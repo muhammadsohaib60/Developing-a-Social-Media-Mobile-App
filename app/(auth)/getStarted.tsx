@@ -1,4 +1,11 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Alert,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import CustomButton from "@/components/CustomButton";
@@ -8,46 +15,69 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomPicker from "@/components/CustomPicker";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
-const dummyUsernames = ["john_doe", "jane_doe", "user123"];
-
 const GetStarted = () => {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [gender, setGender] = useState("");
+  const [fullName, setFullName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date>(new Date());
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [gender, setGender] = useState<string>("");
   const genderItems = [
     { label: "Select Gender", value: "" },
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
     { label: "Other", value: "other" },
   ];
-  const [username, setUsername] = useState("");
-  const [usernameAvailable, setUsernameAvailable] = useState(true);
+  const [username, setUsername] = useState<string>("");
   const { signUpData, setSignUpData } = useGlobalContext();
 
-  useEffect(() => {
-    // Simulate username validation
-    const isAvailable = !dummyUsernames.includes(username.toLowerCase());
-    setUsernameAvailable(isAvailable);
-  }, [username]);
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const isValidAge = (dob: Date): boolean => {
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    return (
+      age > 18 ||
+      (age === 18 && monthDiff >= 0 && today.getDate() >= dob.getDate())
+    );
+  };
 
   const handleSubmit = () => {
-    if (usernameAvailable) {
-      setSignUpData({
-        ...signUpData,
-        username,
-        fullName,
-        email,
-        dateOfBirth,
-        gender,
-      });
-
-      router.push("/location");
-    } else {
-      // Handle the case where the username is not available
-      alert("Please choose a different username.");
+    if (!username) {
+      return Alert.alert("Validation Error", "Please enter a username.");
     }
+    if (!fullName) {
+      return Alert.alert("Validation Error", "Please enter your full name.");
+    }
+    if (!isValidEmail(email)) {
+      return Alert.alert(
+        "Validation Error",
+        "Please enter a valid email address."
+      );
+    }
+    if (!isValidAge(dateOfBirth)) {
+      return Alert.alert(
+        "Validation Error",
+        "You must be at least 18 years old."
+      );
+    }
+    if (!gender) {
+      return Alert.alert("Validation Error", "Please select your gender.");
+    }
+
+    setSignUpData({
+      ...signUpData,
+      username,
+      fullName,
+      email,
+      dateOfBirth,
+      gender,
+    });
+
+    router.push("/location");
   };
 
   return (
@@ -63,11 +93,6 @@ const GetStarted = () => {
           value={username}
           onChangeText={setUsername}
         />
-        {!usernameAvailable ? (
-          <Text style={styles.errorText}>Username not available</Text>
-        ) : (
-          <Text style={styles.errorText}>Username available</Text>
-        )}
         <TextInput
           placeholder="Full Name"
           style={styles.input}
@@ -129,19 +154,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  pickerContainer: {
-    backgroundColor: "white",
-    width: "70%",
-    borderRadius: 50,
-    marginBottom: 10,
-    overflow: "hidden", // This ensures the picker is contained within the rounded borders
-  },
-  picker: {
-    width: "100%",
-    color: "#969696",
-    fontFamily: "ReemRegular",
-    paddingHorizontal: 20,
-  },
   input: {
     backgroundColor: "white",
     width: "70%",
@@ -153,7 +165,13 @@ const styles = StyleSheet.create({
     fontFamily: "ReemRegular",
   },
   errorText: {
-    color: "white",
+    color: "red",
+    marginBottom: 10,
+    fontFamily: "ReemRegular",
+    textAlign: "right",
+  },
+  successText: {
+    color: "green",
     marginBottom: 10,
     fontFamily: "ReemRegular",
     textAlign: "right",
