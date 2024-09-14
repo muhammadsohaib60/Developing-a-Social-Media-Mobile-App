@@ -69,7 +69,6 @@ const Posts = () => {
                 onLoad={() => console.log("Video loaded!")}
                 onError={(error) => console.log("Video error: ", error)}
               />
-              <Text> Video here</Text>
             </>
           ) : (
             <Text>Hello</Text>
@@ -93,6 +92,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     marginBottom: 5,
+    backgroundColor: "black",
   },
   image: {
     width: "100%",
