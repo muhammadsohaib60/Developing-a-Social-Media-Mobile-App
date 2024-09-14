@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import React, { useState } from "react";
 import GradientView from "@/components/GradientView";
 import SearchBar from "@/components/SearchBar";
@@ -20,7 +20,7 @@ const Search = () => {
         onSearch={handleSearch}
       />
       <TabNavigation selectedTab={selectedTab} onSelectTab={setSelectedTab} />
-      <UserList tab={selectedTab} />
+      <UserList tab={selectedTab} query={searchQuery} />
     </GradientView>
   );
 };

@@ -1,3 +1,4 @@
+import { setTribes } from "@/constants/date-setter";
 import { supabase } from "../../supabaseClient";
 import * as FileSystem from "expo-file-system";
 
@@ -621,6 +622,62 @@ class FeedApiManager {
       console.error("Error fetching user reactions:", error);
       throw error;
     }
+  }
+
+  async getUsers() {
+    try {
+      // Step 1: Fetch users with state ID
+      const { data: usersData, error: usersError } = await supabase.from(
+        "user_details"
+      ).select(`
+          user_id,
+          username,
+          profile_pictures,
+          state,
+          country
+        `);
+
+      if (usersError) throw usersError;
+
+      // Step 2: Loop through each user and fetch their state name by matching the state ID
+      const users = await Promise.all(
+        usersData.map(async (user: any) => {
+          // Fetch the state name for each user based on their state ID
+          const { data: stateData, error: stateError } = await supabase
+            .from("reg_state")
+            .select("state_name")
+            .eq("state_id", user.state)
+            .single(); // Use .single() because we expect only one match
+
+          if (stateError) {
+            console.error(
+              `Error fetching state for user ${user.user_id}:`,
+              stateError
+            );
+            return null; // Handle error (you can choose to continue or throw here)
+          }
+
+          // Step 3: Return the formatted user data
+          return {
+            id: user.user_id,
+            title: user.username,
+            img: user.profile_pictures ? user.profile_pictures[0] : null,
+            details: `${stateData?.state_name || "Unknown"}, ${user.country}`,
+          };
+        })
+      );
+
+      // Filter out any null results in case of errors
+      return users.filter((user) => user !== null);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+    }
+  }
+
+  async getTribes() {
+    const res = setTribes();
+    return res;
   }
 }
 

@@ -138,6 +138,35 @@ export const setUser = () => {
   };
 };
 
+export const setTribes = () => {
+  return [
+    {
+      id: "1",
+      title: "React Developers",
+      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTO8H6mRVR83mbxemvDIPW8rbiLZ1b8XVl6Q&s",
+      details: "Community of React Developers",
+    },
+    {
+      id: "2",
+      title: "Java Developers",
+      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzKVrVcrrTL7A8B75qwwrpkAx3uOewEt9RbA&s",
+      details: "Community of Java Developers",
+    },
+    {
+      id: "3",
+      title: "Football Lovers",
+      img: "https://thumbs.dreamstime.com/b/football-soccer-ball-kickoff-game-sunset-38302251.jpg",
+      details: "We love Football",
+    },
+    {
+      id: "4",
+      title: "Software Engineers",
+      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoHsr-I3fcosAKgDVPSgLFiMR-1p_T12P5CA&s",
+      details: "We are Software Developers",
+    },
+  ];
+};
+
 export const setCommunities = () => {
   return [
     {
