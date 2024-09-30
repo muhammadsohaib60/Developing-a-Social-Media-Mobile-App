@@ -29,7 +29,6 @@ const University = () => {
   console.log("Universities:", universities);
 
   const handleSubmit = () => {
-
     if (!university && !otherUniversity) {
       return Alert.alert("Validation Error", "Please select a university.");
     }
