@@ -1,23 +1,97 @@
-import React, { useState } from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-  Text,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { signupDataManager } from "./SignupDataManager";
+import { Alert, SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import CustomPicker from "@/components/CustomPicker2";
+import CustomPicker3 from "@/components/CustomPicker3";
+
+interface Country {
+  callingCode: string[];
+  cca2: string;
+  currency: string[];
+  flag: string;
+  name: string;
+  region: string;
+  subregion: string;
+}
 
 const School = () => {
   const [school, setSchool] = useState<string>("");
   const [year, setYear] = useState<string>("");
   const [otherSchool, setOtherSchool] = useState<string>("");
+  const { signUpData, setSignUpData, setCountryData } = useGlobalContext();
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [countrySpecificData, setCountrySpecificData] = useState<any>(null);
+  const [schools, setSchools] = useState<any>([
+    { label: "Select School", value: "" },
+  ]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await signupDataManager.loadSignupData();
+        const locationData = signupDataManager.getLocationData();
+        if (locationData && locationData.country) {
+          setSelectedCountry(locationData.country);
+          console.log("Selected country in the school:", locationData.country);
+
+          const specificData = await signupDataManager.fetchCountrySpecificData(
+            locationData.country.name
+          );
+          setCountrySpecificData(specificData);
+          setCountryData(specificData);
+
+          const schoolsArr = specificData.schools.map((school: any) => {
+            return {
+              label: school,
+              value: school,
+            };
+          });
+
+          //sort schools alphabetically
+          schoolsArr.sort((a: any, b: any) => {
+            if (a.label < b.label) {
+              return -1;
+            }
+            if (a.label > b.label) {
+              return 1;
+            }
+            return 0;
+          });
+
+          setSchools([...schools, ...schoolsArr]);
+
+          console.log("Country-specific data:", specificData.universities);
+        } else {
+          console.log("Country data is:");
+          console.log(locationData);
+          console.log("No country data found");
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleSubmit = () => {
+    if (!school && !otherSchool) {
+      return Alert.alert("Validation Error", "Please select your school.");
+    }
+    if (!year) {
+      return Alert.alert("Validation Error", "Please select your school year.");
+    }
+
+    setSignUpData({
+      ...signUpData,
+      secondarySchool: school || otherSchool,
+      schoolYear: year,
+    });
     router.push("/university");
   };
 
@@ -29,18 +103,24 @@ const School = () => {
       />
       <View style={styles.container}>
         <View style={styles.row}>
-          <TextInput
-            placeholder="Enter Secondary School"
-            style={{ ...styles.input, width: 200 }}
-            value={school}
-            onChangeText={(text) => setSchool(text)}
+          <CustomPicker
+            items={schools}
+            selectedValue={school}
+            onValueChange={setSchool}
           />
-          <TextInput
-            placeholder="Year"
-            style={{ ...styles.input, width: 100 }}
-            value={year}
-            onChangeText={(text) => setYear(text)}
-            keyboardType="numeric"
+          <CustomPicker3
+            items={[
+              {
+                label: "Year",
+                value: "",
+              },
+              ...Array.from({ length: 75 }, (_, index) => ({
+                label: (2024 - index).toString(),
+                value: (2024 - index).toString(),
+              })),
+            ]}
+            selectedValue={year}
+            onValueChange={setYear}
           />
         </View>
         <TextInput
@@ -53,23 +133,6 @@ const School = () => {
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />
       </View>
 
-      <TouchableOpacity
-        onPress={() => router.push("/university")}
-        style={{
-          position: "absolute",
-          bottom: 15,
-          left: 20,
-        }}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontFamily: "ReemRegular",
-          }}
-        >
-          Skip
-        </Text>
-      </TouchableOpacity>
       <Progress activeCircles={2} />
     </SafeAreaView>
   );
@@ -100,19 +163,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 10,
     marginBottom: 10,
-  },
-  inputContainer: {
-    width: 180,
-    borderRadius: 50,
-    overflow: "hidden",
-  },
-  pickerButton: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 50,
-    alignItems: "center",
-    color: "#969696",
-    fontFamily: "ReemRegular",
   },
   input: {
     backgroundColor: "white",

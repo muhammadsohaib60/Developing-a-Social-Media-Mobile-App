@@ -1,12 +1,47 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import CustomPicker from "@/components/CustomPicker";
 
 const Sports = () => {
+  const { signUpData, setSignUpData } = useGlobalContext();
+  const [sportsClub, setSportsClub] = useState<string>("");
+  const [otherSportsClub, setOtherSportsClub] = useState<string>("");
+  const { countryData } = useGlobalContext();
+  const [clubs, setClubs] = useState<any>([
+    {
+      label: "Select Sports Club",
+      value: "",
+    },
+    ...countryData.sportsClubs
+      .map((club: any) => ({
+        label: club,
+        value: club,
+      }))
+      .sort((a: any, b: any) => a.label.localeCompare(b.label)),
+  ]);
+
   const handleSubmit = () => {
+    if (!sportsClub && !otherSportsClub) {
+      return Alert.alert("Validation Error", "Please select a sports club.");
+    }
+
+    setSignUpData({
+      ...signUpData,
+      sportsClub: sportsClub || otherSportsClub,
+    });
+
     router.push("/ethnic");
   };
 
@@ -25,10 +60,16 @@ const Sports = () => {
           justifyContent: "center",
         }}
       >
-        <TextInput placeholder="Choose Your Sports Club" style={styles.input} />
+        <CustomPicker
+          items={clubs}
+          selectedValue={sportsClub}
+          onValueChange={setSportsClub}
+        />
         <TextInput
           placeholder="Enter Sports Club if not listed"
           style={styles.input}
+          value={otherSportsClub}
+          onChangeText={(text) => setOtherSportsClub(text)}
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

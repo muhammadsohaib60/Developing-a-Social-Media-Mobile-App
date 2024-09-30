@@ -1,12 +1,29 @@
-import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
-import React from "react";
+import { Alert, SafeAreaView, StyleSheet, TextInput, View } from "react-native";
+import React, { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Traditionalist = () => {
+  const { signUpData, setSignUpData } = useGlobalContext();
+  const [tribe, setTribe] = useState<string>("");
+
   const handleSubmit = () => {
+    if (!tribe) {
+      return Alert.alert(
+        "Validation Error",
+        "Please enter the name of your tribe."
+      );
+    }
+
+    setSignUpData({
+      ...signUpData,
+      religion: "Traditionalist",
+      religionSpecific: tribe,
+    });
+
     router.push("/politics");
   };
 
@@ -28,6 +45,8 @@ const Traditionalist = () => {
         <TextInput
           placeholder="Enter the name of your tribe"
           style={styles.input}
+          value={tribe}
+          onChangeText={(text) => setTribe(text)}
         />
 
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />

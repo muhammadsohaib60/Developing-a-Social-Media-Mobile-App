@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Muslim = () => {
+  const { signUpData, setSignUpData } = useGlobalContext();
+
   return (
     <SafeAreaView style={styles.screen}>
       <Header2
@@ -23,6 +25,12 @@ const Muslim = () => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
+              setSignUpData({
+                ...signUpData,
+                religion: "Muslim",
+                religionSpecific: "Sunni",
+              });
+
               router.push("/politics");
             }}
           >
@@ -31,6 +39,11 @@ const Muslim = () => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
+              setSignUpData({
+                ...signUpData,
+                religion: "Muslim",
+                religionSpecific: "Shia",
+              });
               router.push("/politics");
             }}
           >

@@ -1,15 +1,27 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header from "@/components/Header";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Password = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const { signUpData, setSignUpData } = useGlobalContext();
 
   const handleSubmit = () => {
+    if (!password || !confirmPassword) {
+      return Alert.alert("Please fill in both password fields.");
+    }
+
+    if (password !== confirmPassword) {
+      return Alert.alert("Passwords do not match.");
+    }
+
+    setSignUpData({ ...signUpData, password });
+
     router.push("/getStarted");
   };
 

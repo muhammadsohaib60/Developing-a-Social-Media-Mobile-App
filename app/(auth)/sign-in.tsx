@@ -6,12 +6,15 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/CustomButton";
 import Checkbox from "expo-checkbox";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
+import { signin } from "@/utils/authMethods";
+import { signupDataManager } from "./SignupDataManager"; // Import the SignupDataManager
+import { feedApiManager } from "../(root)/FeedApiManager";
 
 const SignIn = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
@@ -19,16 +22,21 @@ const SignIn = () => {
   const [isRemembered, setIsRemembered] = useState(false);
   const router = useRouter();
 
-  const handleSignIn = () => {
-    if (!emailOrPhone || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
+  const handleSignIn = async () => {
+    try {
+      if (!emailOrPhone || !password) {
+        Alert.alert("Error", "Please fill in all fields.");
+        return;
+      }
+
+      await signin(emailOrPhone, password);
+
+      // Navigate to home on successful sign-in
+      router.replace("/home");
+    } catch (error) {
+      console.error("Sign-in failed:", error);
+      Alert.alert("Error", "Sign-in failed. Please try again.");
     }
-
-    // Add your authentication logic here (e.g., Firebase, API call, etc.)
-
-    // Navigate to home on successful sign-in
-    router.push("/home");
   };
 
   return (

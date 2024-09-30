@@ -3,13 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-, "supabaseClinet.js"  ]
+  "include": ["**/*.ts", "**/*.tsx", "supabaseClient.js"]
 }

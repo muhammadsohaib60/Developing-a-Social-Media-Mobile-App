@@ -1,31 +1,180 @@
 import React, { useState } from "react";
-import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
-import CountryPicker from "react-native-country-picker-modal";
+import {
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  View,
+  Text,
+  Alert,
+} from "react-native";
+import CountryPicker, {
+  Country,
+  CountryCode,
+} from "react-native-country-picker-modal";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import Header2 from "@/components/Header2";
 import { router } from "expo-router";
+import { signupDataManager } from "./SignupDataManager";
+import CustomPicker from "@/components/CustomPicker2";
+import { useGlobalContext } from "@/context/GlobalProvider";
+
+// Predefined list of countries
+const COUNTRIES: Country[] = [
+  {
+    cca2: "NG" as CountryCode,
+    name: "Nigeria",
+    callingCode: ["234"],
+    currency: ["NGN"],
+    flag: "flag-ng",
+  },
+  {
+    cca2: "GH" as CountryCode,
+    name: "Ghana",
+    callingCode: ["233"],
+    currency: ["GHS"],
+    flag: "flag-gh",
+  },
+];
 
 const Location = () => {
-  // State management for location data
-  const [country, setCountry] = useState<any>(null);
-  const [state, setState] = useState<string>("");
+  const [country, setCountry] = useState<Country | null>(null);
+  const [state, setState] = useState<string>();
+  const [states, setStates] = useState<any>([]);
   const [localGovernment, setLocalGovernment] = useState<string>("");
+  const [localGovernments, setLocalGovernments] = useState<any>([]);
   const [neighborhood, setNeighborhood] = useState<string>("");
+  const [neighborhoods, setNeighborhoods] = useState<any>([]);
   const [otherNeighborhood, setOtherNeighborhood] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const { signUpData, setSignUpData } = useGlobalContext();
 
-  const handleCountrySelect = (selectedCountry: any) => {
-    setCountry(selectedCountry);
+  // Fetch states for the selected country
+  const fetchStates = async (countryName: string) => {
+    try {
+      const fetchedStates = await signupDataManager.fetchStates(countryName);
+      const statesArr = [
+        { label: "Select State", value: "" },
+        ...fetchedStates.map((state) => ({
+          label: state.state_name,
+          value: state.state_id,
+        })),
+      ];
+      setStates(statesArr);
+    } catch (err) {
+      setError("Failed to fetch states. Please try again.");
+    }
+  };
+
+  // Fetch local governments based on the selected state
+  const fetchLocalGovernments = async (stateName: string) => {
+    try {
+      const fetchedLocalGovernments =
+        await signupDataManager.fetchLocalGovernments(stateName);
+      console.log(fetchedLocalGovernments);
+      const localGovArr = [
+        { label: "Select Local Government", value: "" },
+        ...fetchedLocalGovernments.map((lg) => ({
+          label: lg.local_gov_name,
+          value: lg.local_gov_id,
+        })),
+      ];
+      setLocalGovernments(localGovArr);
+    } catch (err) {
+      setError("Failed to fetch local governments. Please try again.");
+    }
+  };
+
+  // Fetch neighborhoods based on the selected local government
+  const fetchNeighborhoods = async (localGovernmentName: string) => {
+    try {
+      const fetchedNeighborhoods = await signupDataManager.fetchNeighborhoods(
+        localGovernmentName
+      );
+      const neighborhoodArr = [
+        { label: "Select Neighborhood", value: "" },
+        ...fetchedNeighborhoods.map((neighborhood) => ({
+          label: neighborhood.neighborhood_name,
+          value: neighborhood.neighborhood_name,
+        })),
+      ];
+      setNeighborhoods(neighborhoodArr);
+    } catch (err) {
+      setError("Failed to fetch neighborhoods. Please try again.");
+    }
+  };
+
+  const handleCountrySelect = async (selectedCountry: Country) => {
+    setCountry(selectedCountry.name);
+    try {
+      await signupDataManager.setLocationData({
+        country: selectedCountry,
+        state: "",
+        localGovernment: "",
+        neighborhood: "",
+      });
+      console.log("Country data saved:", selectedCountry);
+      // Reset other fields when country changes
+      setState("");
+      setLocalGovernment("");
+      setNeighborhood("");
+      setOtherNeighborhood("");
+      // Fetch states for the new country
+      await fetchStates(selectedCountry.name);
+    } catch (err) {
+      setError("Error saving country data. Please try again.");
+      console.error("Error saving country data:", err);
+    }
+  };
+
+  const handleStateSelect = async (selectedState: string) => {
+    setState(selectedState);
+    setLocalGovernments([]); // Clear previous local governments
+    setNeighborhoods([]); // Clear previous neighborhoods
+
+    try {
+      fetchLocalGovernments(selectedState);
+    } catch (err) {
+      setError("Error fetching local governments.");
+    }
+  };
+
+  const handleLocalGovernmentSelect = async (
+    selectedLocalGovernment: string
+  ) => {
+    setLocalGovernment(selectedLocalGovernment);
+    setNeighborhoods([]); // Clear previous neighborhoods
+    try {
+      await fetchNeighborhoods(selectedLocalGovernment);
+    } catch (err) {
+      setError("Error fetching neighborhoods.");
+    }
   };
 
   const handleSubmit = () => {
-    // Process the location data or navigate to the next screen
-    console.log({
+    if (!country) {
+      Alert.alert("Validation Error", "Please select your country.");
+      return;
+    }
+    if (!state) {
+      Alert.alert("Validation Error", "Please select your state.");
+      return;
+    }
+    if (!localGovernment) {
+      Alert.alert("Validation Error", "Please select your local government.");
+      return;
+    }
+    if (!neighborhood && !otherNeighborhood) {
+      Alert.alert("Validation Error", "Please select your neighborhood.");
+      return;
+    }
+
+    setSignUpData({
+      ...signUpData,
       country,
       state,
       localGovernment,
-      neighborhood,
-      otherNeighborhood,
+      neighborhood: neighborhood || otherNeighborhood,
     });
     router.push("/school");
   };
@@ -46,39 +195,36 @@ const Location = () => {
               countryCode={country?.cca2}
               onSelect={handleCountrySelect}
               containerButtonStyle={styles.pickerButton}
+              countryCodes={COUNTRIES.map((c) => c.cca2)}
             />
           </View>
-          <TextInput
-            placeholder="State"
-            style={styles.input}
-            value={state}
-            onChangeText={(text) => setState(text)}
+          <CustomPicker
+            items={states}
+            selectedValue={state}
+            onValueChange={handleStateSelect}
           />
         </View>
         <View style={styles.row}>
-          <TextInput
-            placeholder="Local Government"
-            style={styles.input}
-            value={localGovernment}
-            onChangeText={(text) => setLocalGovernment(text)}
+          <CustomPicker
+            items={localGovernments}
+            selectedValue={localGovernment}
+            onValueChange={handleLocalGovernmentSelect}
           />
-          <TextInput
-            placeholder="Neighbourhood"
-            style={styles.input}
-            value={neighborhood}
-            onChangeText={(text) => setNeighborhood(text)}
+          <CustomPicker
+            items={neighborhoods}
+            selectedValue={neighborhood}
+            onValueChange={setNeighborhood}
           />
         </View>
         <TextInput
-          placeholder="Enter Neighbourhood if not listed"
+          placeholder="Enter Neighborhood if not listed"
           style={styles.input2}
           value={otherNeighborhood}
-          onChangeText={(text) => setOtherNeighborhood(text)}
+          onChangeText={setOtherNeighborhood}
         />
-
+        {error && <Text style={styles.errorText}>{error}</Text>}
         <CustomButton size={18} text="Next" handlePress={handleSubmit} />
       </View>
-
       <Progress activeCircles={2} />
     </SafeAreaView>
   );
@@ -96,14 +242,12 @@ const styles = StyleSheet.create({
   },
   container: {
     width: "100%",
-    display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
   row: {
     width: "100%",
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -123,16 +267,6 @@ const styles = StyleSheet.create({
     color: "#969696",
     fontFamily: "ReemRegular",
   },
-  input: {
-    backgroundColor: "white",
-    textAlign: "center",
-    width: 180,
-    padding: 10,
-    paddingHorizontal: 20,
-    borderRadius: 50,
-    color: "#969696",
-    fontFamily: "ReemRegular",
-  },
   input2: {
     backgroundColor: "white",
     textAlign: "center",
@@ -143,5 +277,11 @@ const styles = StyleSheet.create({
     color: "#969696",
     fontFamily: "ReemRegular",
     marginBottom: 30,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 10,
   },
 });

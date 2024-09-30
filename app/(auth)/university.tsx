@@ -1,17 +1,49 @@
 import CustomButton from "@/components/CustomButton";
+import CustomPicker from "@/components/CustomPicker2";
+import CustomPicker3 from "@/components/CustomPicker3";
 import Header2 from "@/components/Header2";
 import Progress from "@/components/Progress";
+import { useGlobalContext } from "@/context/GlobalProvider";
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 
 const University = () => {
   const [university, setUniversity] = useState<string>("");
   const [year, setYear] = useState<string>("");
   const [otherUniversity, setOtherUniversity] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
+  const { signUpData, setSignUpData, countryData } = useGlobalContext();
+  const [universities, setUniversities] = useState<any>([
+    {
+      label: "Select University",
+      value: "",
+    },
+    ...countryData.universities
+      .map((uni: any) => ({
+        label: uni,
+        value: uni,
+      }))
+      .sort((a: any, b: any) => a.label.localeCompare(b.label)),
+  ]);
+  console.log("Universities:", universities);
 
   const handleSubmit = () => {
+
+    if (!university && !otherUniversity) {
+      return Alert.alert("Validation Error", "Please select a university.");
+    }
+    if (!year) {
+      return Alert.alert("Validation Error", "Please select a year.");
+    }
+
+    setSignUpData({
+      ...signUpData,
+      university: university || otherUniversity,
+      universityYear: year,
+      department,
+    });
+
     router.push("/religion");
   };
 
@@ -23,18 +55,24 @@ const University = () => {
       />
       <View style={styles.container}>
         <View style={styles.row}>
-          <TextInput
-            placeholder="University/Polyethnic/College"
-            style={{ ...styles.input, width: 250 }}
-            value={university}
-            onChangeText={(text) => setUniversity(text)}
+          <CustomPicker
+            items={universities}
+            selectedValue={university}
+            onValueChange={setUniversity}
           />
-          <TextInput
-            placeholder="Year"
-            style={{ ...styles.input, width: 100 }}
-            value={year}
-            onChangeText={(text) => setYear(text)}
-            keyboardType="numeric"
+          <CustomPicker3
+            items={[
+              {
+                label: "Year",
+                value: "year",
+              },
+              ...Array.from({ length: 75 }, (_, index) => ({
+                label: (2024 - index).toString(),
+                value: (2024 - index).toString(),
+              })),
+            ]}
+            selectedValue={year}
+            onValueChange={setYear}
           />
         </View>
         <TextInput
