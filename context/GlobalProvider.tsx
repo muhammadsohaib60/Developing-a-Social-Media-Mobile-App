@@ -27,6 +27,7 @@ const GlobalProvider = ({ children }: any) => {
     politicalParty: "",
     sportsClub: "",
     ethnicTribe: "",
+    occupation: "",
     imagesUri: [],
   });
 

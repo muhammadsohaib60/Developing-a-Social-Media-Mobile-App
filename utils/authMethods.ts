@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient"; // Adjust this path as needed
 import * as FileSystem from "expo-file-system";
 import { decode } from "base-64";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Occupation from "@/app/(auth)/occupations";
 
 export const signup = async (data: signUpProps) => {
   console.log("Signup data:", data);
@@ -39,6 +40,7 @@ export const signup = async (data: signUpProps) => {
           ethnic_tribe: data.ethnicTribe,
           profile_pictures: [], // Empty array initially
           created_at: currentTimestamp,
+          occupation: data.occupation,
         },
       ])
       .select() // This will return the inserted row, including the auto-incremented user_id
@@ -47,7 +49,7 @@ export const signup = async (data: signUpProps) => {
     if (error) throw error;
 
     if (!newUser || !newUser.user_id) {
-      throw new Error("User creation failed or user ID is missing");
+      throw new Error("User creation failed or user ID is missing.");
     }
 
     // console.log('User signed up successfully:', newUser);

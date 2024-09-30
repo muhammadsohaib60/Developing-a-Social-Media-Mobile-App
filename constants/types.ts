@@ -20,5 +20,6 @@ export interface signUpProps {
   politicalParty: string;
   sportsClub: string;
   ethnicTribe: string;
+  occupation: string;
   imagesUri: string[];
 }

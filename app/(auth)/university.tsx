@@ -43,7 +43,7 @@ const University = () => {
       department,
     });
 
-    router.push("/religion");
+    router.push("/occupations");
   };
 
   return (
