@@ -153,6 +153,21 @@ class SignupDataManager {
     }
   }
 
+  async fetchOccupations() {
+    try {
+      const { data, error } = await supabase
+        .from("reg_occupation")
+        .select("occupation_name");
+
+      if (error) throw error;
+      console.log("data from api", data);
+      return data.map((occupation) => occupation.occupation_name);
+    } catch (error) {
+      console.error("Error fetching occupations:", error);
+      return [];
+    }
+  }
+
   async fetchRegionalData(): Promise<void> {
     try {
       const [states, localGovernments, neighborhoods] = await Promise.all([

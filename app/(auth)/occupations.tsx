@@ -6,29 +6,36 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import Progress from "@/components/Progress";
 import { router } from "expo-router";
 import Header2 from "@/components/Header2";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import CustomPicker from "@/components/CustomPicker";
+import { signupDataManager } from "./SignupDataManager";
 
 const Occupation = () => {
   const { signUpData, setSignUpData } = useGlobalContext();
   const [occupation, setOccupation] = useState<string>("");
   const [otherOccupation, setOtherOccupation] = useState<string>("");
+  const [occupations, setOccupations] = useState<any>([]);
 
-  // Dummy occupation data
-  const occupations = [
-    { label: "Select Occupation", value: "" },
-    { label: "Software Engineer", value: "software_engineer" },
-    { label: "Doctor", value: "doctor" },
-    { label: "Teacher", value: "teacher" },
-    { label: "Designer", value: "designer" },
-    { label: "Accountant", value: "accountant" },
-    { label: "Other", value: "other" },
-  ];
+  const getOccupations = async () => {
+    try {
+      const data = await signupDataManager.fetchOccupations();
+      console.log(data); // Debugging to see what you're getting
+
+      const arr = data.map((occupation: string) => ({
+        label: occupation,
+        value: occupation,
+      }));
+
+      setOccupations(arr); // Assuming `setOccupations` is a state setter
+    } catch (error) {
+      console.error("Error fetching occupations:", error);
+    }
+  };
 
   const handleSubmit = () => {
     if (!occupation && !otherOccupation) {
@@ -42,6 +49,10 @@ const Occupation = () => {
 
     router.push("/religion"); // Change to your next screen route
   };
+
+  useEffect(() => {
+    getOccupations();
+  }, []);
 
   return (
     <SafeAreaView style={styles.screen}>

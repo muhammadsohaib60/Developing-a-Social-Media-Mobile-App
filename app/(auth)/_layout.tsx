@@ -23,7 +23,7 @@ const AuthLayout = () => {
         <Stack.Screen name="muslim" options={{ headerShown: false }} />
         <Stack.Screen name="christian" options={{ headerShown: false }} />
         <Stack.Screen name="traditionalist" options={{ headerShown: false }} />
-        <Stack.Screen name="occupation" options={{ headerShown: false }} />
+        <Stack.Screen name="occupations" options={{ headerShown: false }} />
       </Stack>
     </>
   );
