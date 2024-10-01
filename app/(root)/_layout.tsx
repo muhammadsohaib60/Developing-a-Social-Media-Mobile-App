@@ -31,10 +31,10 @@ const RootLayout = () => {
         }}
       >
         <Tabs.Screen
-          name="home"
+          name="profile"
           options={{
             headerShown: false,
-            title: "Home",
+            title: "Profile",
             tabBarIcon: ({ focused }) => (
               <View>
                 <Image
@@ -127,10 +127,10 @@ const RootLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="settings"
           options={{
             headerShown: false,
-            title: "Profile",
+            title: "Settings",
             tabBarIcon: ({ focused }) => (
               <View>
                 <Image
@@ -200,6 +200,14 @@ const RootLayout = () => {
         />
         <Tabs.Screen
           name="FeedApiManager"
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+            unmountOnBlur: true,
+          }}
+        />
+        <Tabs.Screen
+          name="home"
           options={{
             headerShown: false,
             tabBarButton: () => null,

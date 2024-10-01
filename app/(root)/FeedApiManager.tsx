@@ -8,6 +8,7 @@ export interface Post {
   content_path: string[];
   caption: string;
   created_at: string;
+  title: string;
   user_details: {
     username: string;
     profile_picture: string;
@@ -54,6 +55,7 @@ class FeedApiManager {
     userId: string,
     files: string[],
     caption: string,
+    title: string,
     created_at: string
   ): Promise<{ post: Post | null; failedUploads: number }> {
     let failedUploads = 0;
@@ -120,6 +122,7 @@ class FeedApiManager {
             user_id: userId,
             content_path: uploadedFiles,
             caption: caption,
+            title: title,
             created_at: created_at,
           })
           .select()

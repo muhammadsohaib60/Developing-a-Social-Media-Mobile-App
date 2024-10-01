@@ -32,7 +32,7 @@ const SignIn = () => {
       await signin(emailOrPhone, password);
 
       // Navigate to home on successful sign-in
-      router.replace("/home");
+      router.replace("/profile");
     } catch (error) {
       console.error("Sign-in failed:", error);
       Alert.alert("Error", "Sign-in failed. Please try again.");

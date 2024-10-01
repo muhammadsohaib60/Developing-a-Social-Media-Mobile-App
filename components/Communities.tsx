@@ -8,12 +8,14 @@ import {
 } from "react-native";
 
 import { setCommunities } from "@/constants/date-setter";
+import { router } from "expo-router";
 
 const communityData = setCommunities();
 
 const Communities = () => {
   const handleCommunityPress = (community: any) => {
     console.log(`Navigating to community: ${community.name}`);
+    router.push("/home");
   };
 
   return (

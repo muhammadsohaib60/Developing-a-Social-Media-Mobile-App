@@ -17,12 +17,13 @@ import { feedApiManager } from "./FeedApiManager"; // Update this path
 
 const AddPost = () => {
   const [caption, setCaption] = useState("");
+  const [title, setTitle] = useState("");
   const [media, setMedia] = useState<any>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const pickMedia = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       quality: 1,
     });
@@ -36,6 +37,11 @@ const AddPost = () => {
   const handleSubmit = async () => {
     if (media.length === 0) {
       Alert.alert("Error", "Please select at least one image or video");
+      return;
+    }
+
+    if (!title) {
+      Alert.alert("Error", "Please enter a title");
       return;
     }
 
@@ -63,6 +69,7 @@ const AddPost = () => {
         userId,
         fileUris,
         caption,
+        title,
         created_at
       );
 
@@ -110,6 +117,13 @@ const AddPost = () => {
 
         <TextInput
           style={styles.input}
+          placeholder="Title"
+          placeholderTextColor="#888"
+          value={title}
+          onChangeText={setTitle}
+        />
+        <TextInput
+          style={styles.input}
           placeholder="Write a caption..."
           placeholderTextColor="#888"
           value={caption}
@@ -118,7 +132,7 @@ const AddPost = () => {
 
         <TouchableOpacity style={styles.button} onPress={pickMedia}>
           <Ionicons name="add" size={24} color="white" />
-          <Text style={styles.buttonText}>Add Images or Videos</Text>
+          <Text style={styles.buttonText}>Add Images</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

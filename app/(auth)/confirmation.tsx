@@ -7,7 +7,7 @@ import { router } from "expo-router";
 
 const Confirmation = () => {
   const handleSubmit = () => {
-    router.push("/onboarding");
+    router.push("/home");
   };
 
   return (

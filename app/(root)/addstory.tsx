@@ -22,7 +22,7 @@ const AddStory = () => {
 
   const pickMedia = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       quality: 1,
     });
@@ -96,7 +96,7 @@ const AddStory = () => {
         {/* Pick Media Button */}
         <TouchableOpacity style={styles.button} onPress={pickMedia}>
           <Ionicons name="add" size={24} color="white" />
-          <Text style={styles.buttonText}>Add Images or Videos</Text>
+          <Text style={styles.buttonText}>Add Images</Text>
         </TouchableOpacity>
 
         {/* Submit Button */}
