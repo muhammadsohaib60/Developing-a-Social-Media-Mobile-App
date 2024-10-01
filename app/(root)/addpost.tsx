@@ -17,7 +17,6 @@ import { feedApiManager } from "./FeedApiManager"; // Update this path
 
 const AddPost = () => {
   const [caption, setCaption] = useState("");
-  const [title, setTitle] = useState("");
   const [media, setMedia] = useState<any>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -40,7 +39,7 @@ const AddPost = () => {
       return;
     }
 
-    if (!title) {
+    if (!caption) {
       Alert.alert("Error", "Please enter a title");
       return;
     }
@@ -69,7 +68,6 @@ const AddPost = () => {
         userId,
         fileUris,
         caption,
-        title,
         created_at
       );
 
@@ -117,14 +115,7 @@ const AddPost = () => {
 
         <TextInput
           style={styles.input}
-          placeholder="Title"
-          placeholderTextColor="#888"
-          value={title}
-          onChangeText={setTitle}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Write a caption..."
+          placeholder="Write a Title..."
           placeholderTextColor="#888"
           value={caption}
           onChangeText={setCaption}
