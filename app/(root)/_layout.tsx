@@ -198,14 +198,14 @@ const RootLayout = () => {
             unmountOnBlur: true,
           }}
         />
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="FeedApiManager"
           options={{
             headerShown: false,
             tabBarButton: () => null,
             unmountOnBlur: true,
           }}
-        />
+        /> */}
         <Tabs.Screen
           name="home"
           options={{

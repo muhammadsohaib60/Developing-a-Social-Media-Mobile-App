@@ -43,6 +43,29 @@ const PostComponent = ({ post }: { post: Post }) => {
     return /\.(mp4|avi|mov|wmv|flv|mkv|webm|mpeg)$/i.test(url);
   };
 
+  const lastPress = useRef(0);
+
+  const handleReactionTap = () => {
+    const now = Date.now();
+    const DOUBLE_PRESS_DELAY = 500;
+
+    if (now - lastPress.current < DOUBLE_PRESS_DELAY) {
+      setReactionModalVisible(false);
+      handleDoubleTap();
+    } else {
+      lastPress.current = now;
+      handleSingleTap();
+    }
+  };
+
+  const handleSingleTap = () => {
+    setReactionModalVisible(true);
+  };
+
+  const handleDoubleTap = () => {
+    handleReaction("neutral");
+  };
+
   const sharePost = async () => {
     try {
       const result = await Share.share({
@@ -204,7 +227,7 @@ const PostComponent = ({ post }: { post: Post }) => {
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => setReactionModalVisible(true)}>
+        <TouchableOpacity onPress={handleReactionTap}>
           {reaction === "like" ? (
             <Text style={{ color: "black", fontSize: 20 }}>👍</Text>
           ) : reaction === "dislike" ? (
@@ -277,12 +300,6 @@ const PostComponent = ({ post }: { post: Post }) => {
               onPress={() => handleReaction("dislike")}
             >
               <Text style={styles.reactionText}>👎 Dislike</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.reactionOption}
-              onPress={() => handleReaction("neutral")}
-            >
-              <Text style={styles.reactionText}>😐 Neutral</Text>
             </TouchableOpacity>
           </View>
         </View>
