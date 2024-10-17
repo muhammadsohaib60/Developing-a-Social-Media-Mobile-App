@@ -7,6 +7,14 @@ const img_btn = require("../assets/images/img_btn.png");
 const user = require("../assets/images/user.png");
 const community = require("../assets/images/community.png");
 const post = require("../assets/images/post.png");
+const school = require("../assets/images/school.jpg");
+const uni = require("../assets/images/uni.png");
+const religion = require("../assets/images/religions.jpg");
+const ethnic = require("../assets/images/ethnic.jpg");
+const occ = require("../assets/images/occ.jpg");
+const sports = require("../assets/images/sports.jpg");
+const pol = require("../assets/images/pol.jpg");
+const neighborhood = require("../assets/images/neighborhood.jpg");
 
 export {
   splash1,
@@ -18,4 +26,12 @@ export {
   user,
   community,
   post,
+  school,
+  uni,
+  religion,
+  ethnic,
+  occ,
+  sports,
+  pol,
+  neighborhood,
 };

@@ -1,4 +1,16 @@
-import { community, post, user } from "./images";
+import {
+  community,
+  ethnic,
+  neighborhood,
+  occ,
+  pol,
+  post,
+  religion,
+  school,
+  sports,
+  uni,
+  user,
+} from "./images";
 
 export const setStories = () => {
   return [
@@ -171,29 +183,64 @@ export const setCommunities = () => {
   return [
     {
       id: "1",
-      name: "React Developers",
+      name: "Gulsher",
       imageUrl: community,
       posts: 123,
       members: 123,
     },
     {
       id: "2",
-      name: "Java Developers",
-      imageUrl: community,
+      name: "Secondary School",
+      imageUrl: school,
       posts: 123,
       members: 123,
     },
     {
       id: "3",
-      name: "Football Lovers",
-      imageUrl: community,
+      name: "University",
+      imageUrl: uni,
       posts: 123,
       members: 123,
     },
     {
       id: "4",
-      name: "Software Engineers",
-      imageUrl: community,
+      name: "Occupation",
+      imageUrl: occ,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "5",
+      name: "Religion",
+      imageUrl: religion,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "6",
+      name: "Political Party",
+      imageUrl: pol,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "7",
+      name: "Sports Club",
+      imageUrl: sports,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "8",
+      name: "Ethnic Tribe",
+      imageUrl: ethnic,
+      posts: 123,
+      members: 123,
+    },
+    {
+      id: "9",
+      name: "Neighborhood",
+      imageUrl: neighborhood,
       posts: 123,
       members: 123,
     },

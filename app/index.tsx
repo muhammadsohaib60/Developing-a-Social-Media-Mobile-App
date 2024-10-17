@@ -52,7 +52,7 @@ const SplashScreen = () => {
         opacity.setValue(1);
 
         setTimeout(() => {
-          router.replace("/profile");
+          router.replace("/onboarding");
         }, 1000);
       });
     };
